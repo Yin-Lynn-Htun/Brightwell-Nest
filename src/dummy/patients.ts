@@ -1,0 +1,42 @@
+export const patients = [
+  {
+    id: 1,
+    firstname: 'John',
+    lastname: 'Doe',
+    email: 'johndoe@example.com',
+    mobileCode: '+1',
+    mobileNumber: '5551234567',
+  },
+  {
+    id: 2,
+    firstname: 'Jane',
+    lastname: 'Smith',
+    email: 'janesmith@example.com',
+    mobileCode: '+44',
+    mobileNumber: '7776543210',
+  },
+  {
+    id: 3,
+    firstname: 'Alice',
+    lastname: 'Johnson',
+    email: 'alicejohnson@example.com',
+    mobileCode: '+91',
+    mobileNumber: '9876543210',
+  },
+  {
+    id: 4,
+    firstname: 'Bob',
+    lastname: 'Brown',
+    email: 'bobbrown@example.com',
+    mobileCode: '+61',
+    mobileNumber: '412345678',
+  },
+  {
+    id: 5,
+    firstname: 'Charlie',
+    lastname: 'Davis',
+    email: 'charliedavis@example.com',
+    mobileCode: '+49',
+    mobileNumber: '1598765432',
+  },
+];
