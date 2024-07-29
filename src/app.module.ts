@@ -30,6 +30,7 @@ import { CitiesModule } from './cities/cities.module';
       }),
     }),
     CitiesModule,
+    PatientsModule,
   ],
 })
 export class AppModule {}

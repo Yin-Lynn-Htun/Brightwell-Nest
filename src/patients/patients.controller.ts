@@ -27,11 +27,6 @@ export class PatientsController {
     return this.patientsService.findAll();
   }
 
-  @Get('admin')
-  test(@HostParam('account') account: string) {
-    return `abc ${account} sdf`;
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.patientsService.findOne(+id);
