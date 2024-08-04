@@ -11,6 +11,7 @@ import { join } from 'path';
 import { CitiesModule } from './cities/cities.module';
 import { SpecialitiesModule } from './specialities/specialities.module';
 import { StaffModule } from './staff/staff.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -35,6 +36,7 @@ import { StaffModule } from './staff/staff.module';
     PatientsModule,
     SpecialitiesModule,
     StaffModule,
+    RoleModule,
   ],
 })
 export class AppModule {}
