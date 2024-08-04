@@ -1,26 +1,51 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Staff } from './entities/staff.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class StaffService {
-  create(createStaffDto: CreateStaffDto) {
-    return 'This action adds a new staff';
+  constructor(
+    @InjectRepository(Staff)
+    private readonly staffRespository: Repository<Staff>,
+  ) {}
+
+  async create(createStaffDto: CreateStaffDto) {
+    const staff = this.staffRespository.create(createStaffDto);
+    return await this.staffRespository.save(staff);
   }
 
-  findAll() {
-    return `This action returns all staff`;
+  async findAll() {
+    return await this.staffRespository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staff`;
+  async findOne(id: number) {
+    return await this.staffRespository.findOne({
+      where: { id },
+    });
   }
 
-  update(id: number, updateStaffDto: UpdateStaffDto) {
-    return `This action updates a #${id} staff`;
+  async update(id: number, updateStaffDto: UpdateStaffDto) {
+    const city = await this.findOne(id);
+
+    if (!city) {
+      throw new NotFoundException();
+    }
+
+    Object.assign(city, updateStaffDto);
+
+    return await this.staffRespository.save(city);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} staff`;
+  async remove(id: number) {
+    const city = await this.findOne(id);
+
+    if (!city) {
+      throw new NotFoundException();
+    }
+
+    return await this.staffRespository.remove(city);
   }
 }
