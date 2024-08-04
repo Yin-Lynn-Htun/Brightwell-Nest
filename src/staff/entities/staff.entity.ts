@@ -1,33 +1,14 @@
+import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
+import { Gender } from 'src/patients/entities/patient.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import {
-  IsEmail,
-  IsEnum,
-  IsNotEmpty,
-  IsPhoneNumber,
-  IsPostalCode,
-  isString,
-} from 'class-validator';
 
-export enum Gender {
-  Male = 'Male',
-  Female = 'Female',
-  Other = 'Other',
-}
-
-export enum Relationship {
-  Family = 'Family',
-  Friend = 'Friend',
-  Spouse = 'Spouse',
-  Other = 'Other',
-}
-
-@Entity({ name: 'patients' })
-export class Patient {
+@Entity('staff')
+export class Staff {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -78,26 +59,18 @@ export class Patient {
 
   @Column({ type: 'varchar', length: 50 })
   @IsNotEmpty()
-  eFirstName: string;
+  position: string;
 
   @Column({ type: 'varchar', length: 50 })
   @IsNotEmpty()
-  eLastName: string;
+  department: string;
 
-  @Column({ type: 'varchar', length: 15 })
-  // @IsPhoneNumber()
-  eMobileNumber: string;
+  @Column({ type: 'varchar', length: 50 })
+  @IsNotEmpty()
+  staffPassNo: string;
 
-  @Column({ type: 'varchar', length: 254 })
-  @IsEmail()
-  eEmail: string;
-
-  @Column({
-    type: 'enum',
-    enum: Relationship,
-  })
-  @IsEnum(Relationship)
-  eRelationship: Relationship;
+  @Column({ type: 'text' })
+  description: string;
 
   @CreateDateColumn()
   created_at: Date;

@@ -9,6 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { CitiesModule } from './cities/cities.module';
+import { SpecialitiesModule } from './specialities/specialities.module';
+import { StaffModule } from './staff/staff.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -31,6 +33,8 @@ import { CitiesModule } from './cities/cities.module';
     }),
     CitiesModule,
     PatientsModule,
+    SpecialitiesModule,
+    StaffModule,
   ],
 })
 export class AppModule {}
