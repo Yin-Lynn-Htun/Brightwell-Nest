@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ResponseInterceptor } from './common/response.interceptor';
+import { PassportModule } from '@nestjs/passport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

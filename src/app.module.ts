@@ -12,6 +12,8 @@ import { CitiesModule } from './cities/cities.module';
 import { SpecialitiesModule } from './specialities/specialities.module';
 import { StaffModule } from './staff/staff.module';
 import { RoleModule } from './role/role.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -37,6 +39,8 @@ import { RoleModule } from './role/role.module';
     SpecialitiesModule,
     StaffModule,
     RoleModule,
+    AuthModule,
+    UserModule,
   ],
 })
 export class AppModule {}
