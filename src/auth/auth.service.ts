@@ -1,26 +1,55 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { User } from './../user/entities/user.entity';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async signIn(
+    authcredentialsDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
+    const { email, password } = authcredentialsDto;
+    const user = await this.userRepository.findOne({
+      select: [
+        'id',
+        'email',
+        'firstName',
+        'lastName',
+        'phoneNumber',
+        'password',
+      ],
+      where: { email },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (user && (await bcrypt.compare(password, user.password))) {
+      // PREVIOUSLY HERE ONLY successful message
+      // JWT TOKEN FOR SECURE
+      const payload: JwtPayload = {
+        email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber,
+        role: 'Admin',
+      };
+      console.log(payload);
+      const accessToken = this.jwtService.sign(payload);
+      return { accessToken };
+    } else {
+      throw new UnauthorizedException('Please check your login credentials.');
+    }
   }
 }

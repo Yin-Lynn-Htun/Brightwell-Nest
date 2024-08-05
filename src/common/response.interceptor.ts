@@ -17,7 +17,6 @@ export class ResponseInterceptor<T> implements NestInterceptor {
   ): Observable<ResponseWrapper<T>> {
     return next.handle().pipe(
       map((data) => {
-        console.log('Original data:', data); // Log for debugging
         if (data instanceof HttpException) {
           return {
             statusCode: data.getStatus(),
