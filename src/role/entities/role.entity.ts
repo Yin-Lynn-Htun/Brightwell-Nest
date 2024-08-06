@@ -1,8 +1,11 @@
 import { Status } from 'src/specialities/entities/speciality.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -26,4 +29,7 @@ export class Role {
 
   @Column({ type: 'text' })
   modules: string;
+
+  @OneToMany(() => User, (user) => user.role)
+  users: User;
 }

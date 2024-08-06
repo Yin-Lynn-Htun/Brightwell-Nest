@@ -24,6 +24,9 @@ export class StaffService {
   async findOne(id: number) {
     return await this.staffRespository.findOne({
       where: { id },
+      relations: {
+        role: true,
+      },
     });
   }
 

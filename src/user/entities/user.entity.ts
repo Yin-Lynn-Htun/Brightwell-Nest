@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
+import { Role } from 'src/role/entities/role.entity';
 
 export enum Gender {
   Male = 'Male',
@@ -36,11 +44,11 @@ export class User {
   // @IsPhoneNumber()
   phoneNumber: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', default: 'test123!' })
   password: string;
 
-  @Column({ type: 'varchar', length: 50 })
-  role: string;
+  @ManyToOne(() => Role, (role) => role.users)
+  role: Role;
 
   // contact info
 
@@ -93,4 +101,13 @@ export class User {
   })
   @IsEnum(Relationship)
   eRelationship: Relationship;
+
+  @Column({ type: 'date', default: () => 'NOW()' })
+  dob: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @Column({ type: 'varchar', length: 50, default: 'myanmar' })
+  nationality: string;
 }
