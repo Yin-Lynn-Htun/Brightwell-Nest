@@ -18,7 +18,11 @@ export class StaffService {
   }
 
   async findAll() {
-    return await this.staffRespository.find();
+    return await this.staffRespository.find({
+      relations: {
+        role: true,
+      },
+    });
   }
 
   async findOne(id: number) {
