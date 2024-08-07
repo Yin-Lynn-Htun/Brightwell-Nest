@@ -25,7 +25,7 @@ export class AuthService {
     const { email, password } = authcredentialsDto;
     const user = await this.userRepository.findOne({
       select: [
-        'id',
+        'userId',
         'email',
         'firstName',
         'lastName',

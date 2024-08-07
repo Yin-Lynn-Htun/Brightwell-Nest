@@ -3,15 +3,9 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import {
-  IsEmail,
-  IsEnum,
-  IsNotEmpty,
-  IsPhoneNumber,
-  IsPostalCode,
-  isString,
-} from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
 
 export enum Gender {
   Male = 'Male',

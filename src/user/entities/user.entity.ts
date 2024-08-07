@@ -5,10 +5,10 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
 import { Role } from 'src/role/entities/role.entity';
-import * as bcrypt from 'bcrypt';
 
 export enum Gender {
   Male = 'Male',
@@ -26,7 +26,7 @@ export enum Relationship {
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  userId: number;
 
   // account detail
   @Column({ type: 'varchar', length: 50 })
@@ -106,9 +106,15 @@ export class User {
   @Column({ type: 'date', default: () => 'NOW()' })
   dob: string;
 
-  @CreateDateColumn()
-  created_at: Date;
+  @Column({ type: 'text' })
+  description: string;
 
   @Column({ type: 'varchar', length: 50, default: 'myanmar' })
   nationality: string;
+
+  @UpdateDateColumn()
+  update_at: Date;
+
+  @CreateDateColumn()
+  created_at: Date;
 }

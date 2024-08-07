@@ -7,12 +7,9 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-const saltOrRounds = 10;
 
 @Controller('user')
 export class UserController {
@@ -20,12 +17,7 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    const password = createUserDto.password ?? 'test123!';
-    console.log(password, 'here');
-
-    const hash = await bcrypt.hash(password, saltOrRounds);
-
-    return this.userService.create({ ...createUserDto, password: hash });
+    return this.userService.create(createUserDto);
   }
 
   @Get()
