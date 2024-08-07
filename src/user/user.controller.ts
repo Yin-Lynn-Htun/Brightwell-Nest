@@ -20,7 +20,9 @@ export class UserController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    const password = createUserDto.password;
+    const password = createUserDto.password ?? 'test123!';
+    console.log(password, 'here');
+
     const hash = await bcrypt.hash(password, saltOrRounds);
 
     return this.userService.create({ ...createUserDto, password: hash });

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
 import { Role } from 'src/role/entities/role.entity';
+import * as bcrypt from 'bcrypt';
 
 export enum Gender {
   Male = 'Male',
@@ -44,7 +45,7 @@ export class User {
   // @IsPhoneNumber()
   phoneNumber: string;
 
-  @Column({ type: 'text', default: 'test123!' })
+  @Column({ type: 'text' })
   password: string;
 
   @ManyToOne(() => Role, (role) => role.users)

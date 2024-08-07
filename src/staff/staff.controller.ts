@@ -10,14 +10,19 @@ import {
 import { StaffService } from './staff.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
+import * as bcrypt from 'bcrypt';
 
+const saltOrRounds = 10;
 @Controller('staff')
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
   @Post()
-  create(@Body() createStaffDto: CreateStaffDto) {
-    return this.staffService.create(createStaffDto);
+  async create(@Body() createStaffDto: CreateStaffDto) {
+    const password = createStaffDto.password ?? 'test123!';
+    const hash = await bcrypt.hash(password, saltOrRounds);
+
+    return this.staffService.create({ ...createStaffDto, password: hash });
   }
 
   @Get()

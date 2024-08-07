@@ -1,1 +1,3 @@
-export class CreateStaffDto {}
+export class CreateStaffDto {
+  password: string;
+}
