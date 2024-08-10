@@ -55,6 +55,7 @@ export class DoctorService {
     const doctors = await this.doctorRespository.find({
       relations: {
         user: true,
+        specialties: true,
       },
     });
 
