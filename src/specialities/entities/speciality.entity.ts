@@ -1,7 +1,9 @@
+import { Doctor } from 'src/doctor/entities/doctor.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -20,6 +22,9 @@ export class Speciality {
 
   @CreateDateColumn()
   createdOn: Date;
+
+  @ManyToMany(() => Doctor, (doctor) => doctor.specialties)
+  doctors: Doctor[];
 
   @Column({
     type: 'enum',

@@ -3,7 +3,7 @@ import { CreateSpecialityDto } from './dto/create-speciality.dto';
 import { UpdateSpecialityDto } from './dto/update-speciality.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Speciality } from './entities/speciality.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class SpecialitiesService {
@@ -20,6 +20,12 @@ export class SpecialitiesService {
 
   async findAll() {
     return await this.specialitiesRespository.find();
+  }
+
+  async findByIds(ids: number[]) {
+    return await this.specialitiesRespository.findBy({
+      id: In(ids),
+    });
   }
 
   async findOne(id: number) {

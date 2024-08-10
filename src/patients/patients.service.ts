@@ -42,12 +42,12 @@ export class PatientsService {
   }
 
   async remove(id: number) {
-    const city = await this.findOne(id);
+    const patient = await this.findOne(id);
 
-    if (!city) {
+    if (!patient) {
       throw new NotFoundException();
     }
 
-    return await this.patientsRespository.remove(city);
+    return await this.patientsRespository.remove(patient);
   }
 }

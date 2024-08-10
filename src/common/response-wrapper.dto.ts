@@ -1,5 +1,5 @@
 export class ResponseWrapper<T> {
-  statusCode: number;
+  status: number;
   message: string;
   data?: T;
   error?: any;

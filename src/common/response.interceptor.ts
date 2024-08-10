@@ -19,13 +19,13 @@ export class ResponseInterceptor<T> implements NestInterceptor {
       map((data) => {
         if (data instanceof HttpException) {
           return {
-            statusCode: data.getStatus(),
+            status: data.getStatus(),
             message: data.message,
             error: data.getResponse(),
           };
         }
         return {
-          statusCode: HttpStatus.OK,
+          status: HttpStatus.OK,
           message: 'Request successful',
           data,
         };

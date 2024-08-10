@@ -14,6 +14,9 @@ import { StaffModule } from './staff/staff.module';
 import { RoleModule } from './role/role.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { DoctorModule } from './doctor/doctor.module';
+import { DoctorEduModule } from './doctor-edu/doctor-edu.module';
+import { DoctorExpModule } from './doctor-exp/doctor-exp.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -41,6 +44,9 @@ import { UserModule } from './user/user.module';
     RoleModule,
     AuthModule,
     UserModule,
+    DoctorModule,
+    DoctorEduModule,
+    DoctorExpModule,
   ],
 })
 export class AppModule {}
