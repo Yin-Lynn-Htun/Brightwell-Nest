@@ -21,8 +21,6 @@ export class DoctorService {
   ) {}
 
   async create(createDoctorDto: CreateDoctorDto) {
-    console.log(createDoctorDto);
-
     const { educations, specialties } = createDoctorDto;
 
     const eduList: any = [];
@@ -45,7 +43,7 @@ export class DoctorService {
       ...createDoctorDto,
       specialties: specialityEntities,
       user,
-      // educations: eduList,
+      educations: eduList,
     });
 
     return await this.doctorRespository.save(doc);
@@ -74,8 +72,17 @@ export class DoctorService {
     return transformedStaffMembers;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} doctor`;
+  async findOne(id: number) {
+    const doctor = await this.doctorRespository.findOne({
+      where: { doctorId: id },
+      relations: {
+        user: true,
+        specialties: true,
+        educations: true,
+      },
+    });
+
+    return doctor;
   }
 
   update(id: number, updateDoctorDto: UpdateDoctorDto) {
