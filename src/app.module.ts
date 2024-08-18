@@ -17,6 +17,8 @@ import { UserModule } from './user/user.module';
 import { DoctorModule } from './doctor/doctor.module';
 import { DoctorEduModule } from './doctor-edu/doctor-edu.module';
 import { DoctorExpModule } from './doctor-exp/doctor-exp.module';
+import { PackageModule } from './package/package.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -47,6 +49,8 @@ import { DoctorExpModule } from './doctor-exp/doctor-exp.module';
     DoctorModule,
     DoctorEduModule,
     DoctorExpModule,
+    PackageModule,
+    TagModule,
   ],
 })
 export class AppModule {}
