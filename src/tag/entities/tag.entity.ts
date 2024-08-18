@@ -11,7 +11,7 @@ export class Tag {
   id: number;
 
   @Column()
-  title: string;
+  name: string;
 
   @CreateDateColumn()
   created_at: Date;

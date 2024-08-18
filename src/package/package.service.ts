@@ -4,17 +4,39 @@ import { UpdatePackageDto } from './dto/update-package.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Package } from './entities/package.entity';
 import { Repository } from 'typeorm';
+import { Tag } from 'src/tag/entities/tag.entity';
+import { TagService } from 'src/tag/tag.service';
 
 @Injectable()
 export class PackageService {
   constructor(
     @InjectRepository(Package)
     private packageRepository: Repository<Package>,
+    private readonly tagRepository: TagService,
   ) {}
 
-  @Post()
-  async create(@Body() createPackgeDto: CreatePackageDto) {
-    const pkg = this.packageRepository.create(createPackgeDto);
+  async create(createPackgeDto: CreatePackageDto) {
+    const { tags } = createPackgeDto;
+
+    const tagObjs = await Promise.all(
+      tags.map(async (tag) => {
+        if (isNaN(tag as any)) {
+          return await this.tagRepository.create({ name: tag });
+        } else {
+          const val = await this.tagRepository.findOne(tag as any);
+
+          if (!val) {
+            return await this.tagRepository.create({ name: tag });
+          }
+          return val;
+        }
+      }),
+    );
+
+    const pkg = this.packageRepository.create({
+      ...createPackgeDto,
+      tags: tagObjs,
+    });
 
     return await this.packageRepository.save(pkg);
   }

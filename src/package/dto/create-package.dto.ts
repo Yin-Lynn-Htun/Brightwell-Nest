@@ -1,1 +1,3 @@
-export class CreatePackageDto {}
+export class CreatePackageDto {
+  tags: string[];
+}
