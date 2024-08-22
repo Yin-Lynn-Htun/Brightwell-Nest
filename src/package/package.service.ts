@@ -4,7 +4,6 @@ import { UpdatePackageDto } from './dto/update-package.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Package } from './entities/package.entity';
 import { Repository } from 'typeorm';
-import { Tag } from 'src/tag/entities/tag.entity';
 import { TagService } from 'src/tag/tag.service';
 
 @Injectable()

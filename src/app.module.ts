@@ -19,6 +19,7 @@ import { DoctorEduModule } from './doctor-edu/doctor-edu.module';
 import { DoctorExpModule } from './doctor-exp/doctor-exp.module';
 import { PackageModule } from './package/package.module';
 import { TagModule } from './tag/tag.module';
+import { ScheduleModule } from './schedule/schedule.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -51,6 +52,7 @@ import { TagModule } from './tag/tag.module';
     DoctorExpModule,
     PackageModule,
     TagModule,
+    ScheduleModule,
   ],
 })
 export class AppModule {}
