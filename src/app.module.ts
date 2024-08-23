@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { CatsController } from './cats/cats.controller';
 import { PatientsModule } from './patients/patients.module';
 import { CatsService } from './cats/cats.service';
-import { CatsModule } from './cats/cats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
@@ -19,12 +18,15 @@ import { DoctorEduModule } from './doctor-edu/doctor-edu.module';
 import { DoctorExpModule } from './doctor-exp/doctor-exp.module';
 import { PackageModule } from './package/package.module';
 import { TagModule } from './tag/tag.module';
+import { ScheduleModule as NestScheduleModule } from '@nestjs/schedule';
 import { ScheduleModule } from './schedule/schedule.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   controllers: [AppController, CatsController],
   providers: [AppService, CatsService],
   imports: [
+    NestScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -53,6 +55,7 @@ import { ScheduleModule } from './schedule/schedule.module';
     PackageModule,
     TagModule,
     ScheduleModule,
+    AppointmentModule,
   ],
 })
 export class AppModule {}

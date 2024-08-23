@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { DoctorEdu } from 'src/doctor-edu/entities/doctor-edu.entity';
+import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Speciality } from 'src/specialities/entities/speciality.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -33,6 +34,10 @@ export class Doctor {
   // education
   @OneToMany(() => DoctorEdu, (education) => education.doctors)
   educations: DoctorEdu[];
+
+  // schedules
+  @OneToMany(() => Schedule, (schedule) => schedule.doctor)
+  schedules: Schedule[];
 
   // TODO: Work exp
 
