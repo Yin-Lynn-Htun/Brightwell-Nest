@@ -39,7 +39,7 @@ export class DoctorService {
       ...createDoctorDto,
     });
 
-    const doc = await this.doctorRespository.create({
+    const doc = this.doctorRespository.create({
       ...createDoctorDto,
       specialties: specialityEntities,
       user,

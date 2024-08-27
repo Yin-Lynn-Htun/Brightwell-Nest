@@ -21,6 +21,7 @@ import { TagModule } from './tag/tag.module';
 import { ScheduleModule as NestScheduleModule } from '@nestjs/schedule';
 import { ScheduleModule } from './schedule/schedule.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -56,6 +57,7 @@ import { AppointmentModule } from './appointment/appointment.module';
     TagModule,
     ScheduleModule,
     AppointmentModule,
+    ScheduleJobsModule,
   ],
 })
 export class AppModule {}

@@ -47,6 +47,9 @@ export class PackageService {
   async findOne(id: number) {
     return await this.packageRepository.findOne({
       where: { id },
+      relations: {
+        tags: true,
+      },
     });
   }
 
