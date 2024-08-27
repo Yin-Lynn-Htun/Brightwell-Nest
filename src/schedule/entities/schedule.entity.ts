@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('Schedule')
+@Entity()
 export class Schedule {
   @PrimaryGeneratedColumn()
   id: number;
@@ -19,8 +19,8 @@ export class Schedule {
   @ManyToOne(() => Doctor, (doctor) => doctor.schedules)
   doctor: Doctor;
 
-  @Column({ type: 'enum', enum: DayOfWeek })
-  dayOfWeek: DayOfWeek;
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  date: string;
 
   @Column({ type: 'time' })
   startTime: string;

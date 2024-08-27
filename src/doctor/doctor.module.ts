@@ -16,5 +16,6 @@ import { SpecialitiesModule } from 'src/specialities/specialities.module';
   ],
   controllers: [DoctorController],
   providers: [DoctorService],
+  exports: [DoctorService],
 })
 export class DoctorModule {}

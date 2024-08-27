@@ -15,3 +15,13 @@ export enum AppointmentStatus {
   CANCELED = 'Canceled',
   WAITLISTED = 'Waitlisted',
 }
+
+export const DayOfWeeks = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+];
