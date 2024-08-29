@@ -1,3 +1,4 @@
+import { JwtModule } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -22,10 +23,12 @@ import { ScheduleModule as NestScheduleModule } from '@nestjs/schedule';
 import { ScheduleModule } from './schedule/schedule.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
+import { ClientAuthService } from './client-auth/client-auth.service';
+import { ClientAuthModule } from './client-auth/client-auth.module';
 
 @Module({
   controllers: [AppController, CatsController],
-  providers: [AppService, CatsService],
+  providers: [AppService, CatsService, ClientAuthService],
   imports: [
     NestScheduleModule.forRoot(),
     ConfigModule.forRoot(),
@@ -43,6 +46,12 @@ import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
         synchronize: true,
       }),
     }),
+    JwtModule.register({
+      secret: 'topSecret92', // SECRET KEY - TEXT OR FILE
+      signOptions: {
+        expiresIn: 3600, // TOKEN EXPIRY TIME
+      },
+    }),
     CitiesModule,
     PatientsModule,
     SpecialitiesModule,
@@ -58,6 +67,7 @@ import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
     ScheduleModule,
     AppointmentModule,
     ScheduleJobsModule,
+    ClientAuthModule,
   ],
 })
 export class AppModule {}

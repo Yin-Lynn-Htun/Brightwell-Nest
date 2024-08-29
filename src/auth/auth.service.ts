@@ -24,6 +24,7 @@ export class AuthService {
   ): Promise<{ accessToken: string }> {
     const { email, password } = authcredentialsDto;
     const user = await this.userRepository.findOne({
+      where: { email },
       select: [
         'userId',
         'email',
@@ -32,7 +33,6 @@ export class AuthService {
         'phoneNumber',
         'password',
       ],
-      where: { email },
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {

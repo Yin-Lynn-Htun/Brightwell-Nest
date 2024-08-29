@@ -37,6 +37,9 @@ export class Patient {
   @IsEmail()
   email: string;
 
+  @Column({ type: 'varchar', length: 254, default: 'test123!' })
+  password: string;
+
   @Column({ type: 'date', default: () => 'NOW()' })
   dob: string;
 

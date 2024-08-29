@@ -1,11 +1,18 @@
-import { Body, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Body,
+  Injectable,
+  NotFoundException,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { patients } from 'src/dummy/patients';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Patient } from './entities/patient.entity';
 import { Repository } from 'typeorm';
-
+import * as bcrypt from 'bcrypt';
+import { saltOrRounds } from 'src/constants';
 @Injectable()
 export class PatientsService {
   constructor(
@@ -14,7 +21,13 @@ export class PatientsService {
   ) {}
 
   async create(createPatientDto: CreatePatientDto) {
-    const patient = this.patientsRespository.create(createPatientDto);
+    const patient = this.patientsRespository.create({
+      ...createPatientDto,
+      password: await bcrypt.hash(
+        createPatientDto.password || 'test123!',
+        saltOrRounds,
+      ),
+    });
 
     return await this.patientsRespository.save(patient);
   }
@@ -49,5 +62,11 @@ export class PatientsService {
     }
 
     return await this.patientsRespository.remove(patient);
+  }
+
+  async findByEmail(email: string) {
+    return await this.patientsRespository.findOneBy({
+      email,
+    });
   }
 }

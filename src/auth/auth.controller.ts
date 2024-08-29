@@ -22,4 +22,11 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
     return this.authService.signIn(createAuthDto);
   }
+
+  @Post('/patient/sign-in')
+  patientSignIn(
+    @Body() createAuthDto: AuthCredentialsDto,
+  ): Promise<{ accessToken: string }> {
+    return this.authService.signIn(createAuthDto);
+  }
 }

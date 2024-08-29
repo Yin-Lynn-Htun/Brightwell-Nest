@@ -59,6 +59,9 @@ export class CreatePatientDto {
   @Length(1, 254)
   eEmail: string;
 
+  @Length(1, 254)
+  password: string;
+
   @IsEnum(Relationship)
   eRelationship: Relationship;
 }
