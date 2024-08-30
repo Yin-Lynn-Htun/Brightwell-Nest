@@ -25,6 +25,7 @@ import { AppointmentModule } from './appointment/appointment.module';
 import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
 import { ClientAuthService } from './client-auth/client-auth.service';
 import { ClientAuthModule } from './client-auth/client-auth.module';
+import { ClientAccountModule } from './client-account/client-account.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -68,6 +69,7 @@ import { ClientAuthModule } from './client-auth/client-auth.module';
     AppointmentModule,
     ScheduleJobsModule,
     ClientAuthModule,
+    ClientAccountModule,
   ],
 })
 export class AppModule {}
