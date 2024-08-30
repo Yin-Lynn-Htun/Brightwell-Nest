@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 export enum Gender {
   Male = 'Male',
@@ -98,4 +100,7 @@ export class Patient {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.schedule)
+  appointments: Appointment;
 }

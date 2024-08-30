@@ -17,17 +17,11 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Doctor)
-  doctor: Doctor;
-
-  @ManyToOne(() => Patient)
+  @ManyToOne(() => Patient, (patient) => patient.appointments)
   patient: Patient;
 
   @ManyToOne(() => Schedule, (schedule) => schedule.appointments)
   schedule: Schedule; // Optional relation
-
-  @Column({ type: 'date' })
-  appointmentDate: Date;
 
   @Column({ type: 'enum', enum: AppointmentStatus })
   status: AppointmentStatus;

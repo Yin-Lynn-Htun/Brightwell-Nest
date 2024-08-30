@@ -37,8 +37,8 @@ export class PatientsService {
   }
 
   async findOne(id: number) {
-    return await this.patientsRespository.findOne({
-      where: { id },
+    return await this.patientsRespository.findOneBy({
+      id,
     });
   }
 

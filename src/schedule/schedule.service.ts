@@ -64,8 +64,10 @@ export class ScheduleService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} schedule`;
+  async findOne(id: number) {
+    return await this.scheduleRespository.findOneBy({
+      id: id,
+    });
   }
 
   update(id: number, updateScheduleDto: UpdateScheduleDto) {
