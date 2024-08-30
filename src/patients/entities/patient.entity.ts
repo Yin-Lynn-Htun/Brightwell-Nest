@@ -101,6 +101,6 @@ export class Patient {
   @CreateDateColumn()
   created_at: Date;
 
-  @OneToMany(() => Appointment, (appointment) => appointment.schedule)
-  appointments: Appointment;
+  @OneToMany(() => Appointment, (appointment) => appointment.patient)
+  appointments: Appointment[];
 }
