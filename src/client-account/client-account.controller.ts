@@ -29,31 +29,14 @@ export class ClientAccountController {
     return this.patientService.findOne(req?.user?.id as number);
   }
 
+  @Get('/appointments')
+  @UseGuards(JwtAuthGuard)
+  appointments(@Req() req: Request & { user: { id: number } }) {
+    return this.clientAccountService.getAppointment(req.user.id);
+  }
+
   @Post()
   create(@Body() createClientAccountDto: CreateClientAccountDto) {
     return this.clientAccountService.create(createClientAccountDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.clientAccountService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.clientAccountService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateClientAccountDto: UpdateClientAccountDto,
-  ) {
-    return this.clientAccountService.update(+id, updateClientAccountDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientAccountService.remove(+id);
   }
 }

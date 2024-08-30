@@ -6,18 +6,30 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
+import { Request } from 'express';
 
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto) {
-    return this.appointmentService.create(createAppointmentDto);
+  @UseGuards(JwtAuthGuard)
+  create(
+    @Req() req: Request & { user: { id: number } },
+    @Body() createAppointmentDto: CreateAppointmentDto,
+  ) {
+    const patientId = req.user.id;
+    return this.appointmentService.create({
+      ...createAppointmentDto,
+      patientId,
+    });
   }
 
   @Get()

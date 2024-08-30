@@ -17,7 +17,9 @@ export class AppointmentService {
     private readonly scheduleService: ScheduleService,
   ) {}
 
-  async create(createAppointmentDto: CreateAppointmentDto) {
+  async create(
+    createAppointmentDto: CreateAppointmentDto & { patientId: number },
+  ) {
     const { patientId, scheduleId } = createAppointmentDto;
 
     const patient = await this.patientService.findOne(patientId);
