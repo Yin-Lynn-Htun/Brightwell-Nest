@@ -5,9 +5,11 @@ import {
   ManyToMany,
   JoinTable,
   CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
+import { Purchase } from 'src/purchase/entities/purchase.entity';
 
 @Entity()
 export class Package {
@@ -32,9 +34,8 @@ export class Package {
   @Column('decimal')
   normalPrice: number;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  users: User[];
+  @ManyToOne(() => Purchase)
+  purchases: Purchase[];
 
   @ManyToMany(() => Tag)
   @JoinTable()

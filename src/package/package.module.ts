@@ -9,5 +9,6 @@ import { TagModule } from 'src/tag/tag.module';
   imports: [TypeOrmModule.forFeature([Package]), TagModule],
   controllers: [PackageController],
   providers: [PackageService],
+  exports: [PackageService],
 })
 export class PackageModule {}

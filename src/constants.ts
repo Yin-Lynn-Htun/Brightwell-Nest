@@ -16,6 +16,12 @@ export enum AppointmentStatus {
   WAITLISTED = 'Waitlisted',
 }
 
+export enum PurchaseStatus {
+  ACTIVE = 'Active',
+  EXPIRED = 'Expired',
+  CANCELLED = 'Cancelled',
+}
+
 export const DayOfWeeks = [
   'Sunday',
   'Monday',

@@ -5,9 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { Purchase } from 'src/purchase/entities/purchase.entity';
 
 export enum Gender {
   Male = 'Male',
@@ -48,6 +50,9 @@ export class Patient {
   @Column({ type: 'varchar', length: 15 })
   // @IsPhoneNumber()
   phoneNumber: string;
+
+  @ManyToOne(() => Purchase)
+  purchases: Purchase[];
 
   @Column({
     type: 'enum',

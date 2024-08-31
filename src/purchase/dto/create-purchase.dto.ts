@@ -1,1 +1,3 @@
-export class CreatePurchaseDto {}
+export class CreatePurchaseDto {
+  packageId: number;
+}
