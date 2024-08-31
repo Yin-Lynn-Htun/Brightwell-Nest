@@ -33,7 +33,9 @@ export class AppointmentService {
       status: AppointmentStatus.BOOKED,
     });
 
-    return await this.appointmentRepository.save(appt);
+    const data = await this.appointmentRepository.save(appt);
+
+    return { ...data, responseMessage: 'Appointment created successfully!' };
   }
 
   findAll() {

@@ -13,7 +13,7 @@ import { JwtStrategy } from './client-jwt.strategy';
     JwtModule.register({
       secret: 'patient123!',
       signOptions: {
-        expiresIn: '1h',
+        expiresIn: '24h',
       },
     }),
   ],

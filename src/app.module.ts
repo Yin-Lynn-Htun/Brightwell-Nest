@@ -26,6 +26,7 @@ import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
 import { ClientAuthService } from './client-auth/client-auth.service';
 import { ClientAuthModule } from './client-auth/client-auth.module';
 import { ClientAccountModule } from './client-account/client-account.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -50,7 +51,7 @@ import { ClientAccountModule } from './client-account/client-account.module';
     JwtModule.register({
       secret: 'topSecret92', // SECRET KEY - TEXT OR FILE
       signOptions: {
-        expiresIn: 3600, // TOKEN EXPIRY TIME
+        expiresIn: '24h', // TOKEN EXPIRY TIME
       },
     }),
     CitiesModule,
@@ -70,6 +71,7 @@ import { ClientAccountModule } from './client-account/client-account.module';
     ScheduleJobsModule,
     ClientAuthModule,
     ClientAccountModule,
+    PurchaseModule,
   ],
 })
 export class AppModule {}

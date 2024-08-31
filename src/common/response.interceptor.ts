@@ -24,10 +24,11 @@ export class ResponseInterceptor<T> implements NestInterceptor {
             error: data.getResponse(),
           };
         }
+
         return {
           status: HttpStatus.OK,
-          message: 'Request successful',
-          data,
+          message: data?.responseMessage ?? 'Request successful',
+          data: data,
         };
       }),
     );
