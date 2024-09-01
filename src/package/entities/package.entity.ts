@@ -20,7 +20,7 @@ export class Package {
   name: string;
 
   @Column('text')
-  description: string; // This field can be used for rich text editor content
+  description: string;
 
   @Column({ type: 'date' })
   startDate: string;

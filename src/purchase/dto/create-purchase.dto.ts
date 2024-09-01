@@ -1,3 +1,3 @@
 export class CreatePurchaseDto {
-  packageId: number;
+  packages: { packageId: number; quantity: number }[];
 }

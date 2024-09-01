@@ -35,8 +35,14 @@ export class ClientAccountController {
     return this.clientAccountService.getAppointment(req.user.id);
   }
 
-  @Post()
-  create(@Body() createClientAccountDto: CreateClientAccountDto) {
-    return this.clientAccountService.create(createClientAccountDto);
+  @Get('/packages')
+  @UseGuards(JwtAuthGuard)
+  packages(@Req() req: Request & { user: { id: number } }) {
+    return this.clientAccountService.getPackages(req.user.id);
   }
+
+  // @Post()
+  // create(@Body() createClientAccountDto: CreateClientAccountDto) {
+  //   return this.clientAccountService.create(createClientAccountDto);
+  // }
 }

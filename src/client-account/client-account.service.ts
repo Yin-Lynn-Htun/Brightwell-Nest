@@ -77,23 +77,14 @@ export class ClientAccountService {
     return groupedAppointments;
   }
 
-  create(createClientAccountDto: CreateClientAccountDto) {
-    return 'This action adds a new clientAccount';
-  }
+  async getPackages(patientId: number) {
+    const data = await this.patientsRespository.findOne({
+      where: {
+        id: patientId,
+      },
+      relations: ['purchases', 'purchases.package'],
+    });
 
-  findAll() {
-    return `This action returns all clientAccount`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} clientAccount`;
-  }
-
-  update(id: number, updateClientAccountDto: UpdateClientAccountDto) {
-    return `This action updates a #${id} clientAccount`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} clientAccount`;
+    return data?.purchases ?? [];
   }
 }

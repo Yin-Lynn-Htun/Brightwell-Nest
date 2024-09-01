@@ -51,9 +51,6 @@ export class Patient {
   // @IsPhoneNumber()
   phoneNumber: string;
 
-  @ManyToOne(() => Purchase)
-  purchases: Purchase[];
-
   @Column({
     type: 'enum',
     enum: Gender,
@@ -108,4 +105,7 @@ export class Patient {
 
   @OneToMany(() => Appointment, (appointment) => appointment.patient)
   appointments: Appointment[];
+
+  @OneToMany(() => Purchase, (purchase) => purchase.patient)
+  purchases: Purchase[];
 }

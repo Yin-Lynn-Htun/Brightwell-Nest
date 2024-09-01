@@ -26,7 +26,7 @@ export class PurchaseController {
     @Body() createPurchaseDto: CreatePurchaseDto,
   ) {
     const patientId = +req.user?.id;
-    return this.purchaseService.create({ ...createPurchaseDto, patientId });
+    return this.purchaseService.create(patientId, createPurchaseDto);
   }
 
   @Get()

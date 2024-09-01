@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -24,22 +25,32 @@ export class PurchaseService {
   ) {}
 
   @UseGuards(JwtAuthGuard)
-  async create(createPurchaseDto: CreatePurchaseDto & { patientId: number }) {
-    const { packageId, patientId } = createPurchaseDto;
+  async create(patientId: number, purchasePackagesDto: CreatePurchaseDto) {
+    const { packages } = purchasePackagesDto;
 
-    console.log(packageId, patientId, 'here');
-    const pkg = await this.packageService.findOne(packageId);
+    const purchasePackages = [];
+
     const patient = await this.patientService.findOne(patientId);
 
-    if (!pkg || !patient) throw new BadRequestException();
+    if (!patient) throw new NotFoundException('User not found.');
 
-    const purchase = this.purchaseRepository.create({
-      package: pkg,
-      patient: patient,
-      status: PurchaseStatus.ACTIVE,
-    });
+    for (const pkg of packages) {
+      const item = await this.packageService.findOne(pkg.packageId);
 
-    return await this.purchaseRepository.save(purchase);
+      if (!item) throw new NotFoundException('Package not found.');
+
+      for (let i = 0; i < pkg.quantity; i++) {
+        const userPackage = this.purchaseRepository.create({
+          package: item,
+          patient: patient,
+          status: PurchaseStatus.ACTIVE,
+        });
+
+        purchasePackages.push(await this.purchaseRepository.save(userPackage));
+      }
+    }
+
+    return purchasePackages;
   }
 
   findAll() {
