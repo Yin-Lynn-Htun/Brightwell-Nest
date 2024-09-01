@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
@@ -33,6 +34,11 @@ export class ScheduleController {
   @Get('/doctor/:id')
   findByDoctorId(@Param('id') id: string) {
     return this.scheduleService.findByDoctorId(+id);
+  }
+
+  @Get('/doctor/:id/date')
+  findByDoctorIdAndDate(@Param('id') id: string, @Query('date') date: string) {
+    return this.scheduleService.findByDoctorIdAndDate(+id, date);
   }
 
   @Patch(':id')

@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Schedule } from './entities/schedule.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { DayOfWeeks } from 'src/constants';
 import { DoctorService } from 'src/doctor/doctor.service';
+import { getWeekDates } from 'src/utils';
 
 @Injectable()
 export class ScheduleService {
@@ -62,6 +63,41 @@ export class ScheduleService {
         doctorId: doctorId,
       },
     });
+  }
+
+  async findByDoctorIdAndDate(doctorId: number, date: string) {
+    const targetDate = new Date(date);
+    const weekDates = getWeekDates(targetDate);
+
+    const response = [];
+
+    for (const day of weekDates) {
+      // Fetch all schedules for this doctor within the week range (you can optimize by narrowing it down to the week range if needed)
+      const schedules = await this.scheduleRespository.find({
+        where: {
+          doctor: {
+            doctorId: doctorId,
+          },
+        },
+      });
+
+      // Filter the schedules that fall on the current `day`
+      const schedulesForDay = schedules.filter((schedule) =>
+        moment(schedule.date).isSame(day, 'day'),
+      );
+
+      console.log('here', day);
+
+      response.push({
+        date: day,
+        schedules: schedulesForDay.map((schedule) => ({
+          startTime: schedule.startTime, // Adjust as per your entity
+          endTime: schedule.endTime, // Adjust as per your entity
+        })),
+      });
+    }
+
+    return response;
   }
 
   async findOne(id: number) {
