@@ -91,6 +91,7 @@ export class ScheduleService {
       response.push({
         date: day,
         schedules: schedulesForDay.map((schedule) => ({
+          id: schedule.id,
           startTime: schedule.startTime, // Adjust as per your entity
           endTime: schedule.endTime, // Adjust as per your entity
         })),
@@ -101,8 +102,11 @@ export class ScheduleService {
   }
 
   async findOne(id: number) {
-    return await this.scheduleRespository.findOneBy({
-      id: id,
+    return await this.scheduleRespository.findOne({
+      where: {
+        id: id,
+      },
+      relations: ['appointments', 'doctor.user', 'appointments.patient'],
     });
   }
 
