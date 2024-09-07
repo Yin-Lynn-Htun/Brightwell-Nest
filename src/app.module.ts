@@ -27,6 +27,9 @@ import { ClientAuthService } from './client-auth/client-auth.service';
 import { ClientAuthModule } from './client-auth/client-auth.module';
 import { ClientAccountModule } from './client-account/client-account.module';
 import { PurchaseModule } from './purchase/purchase.module';
+import { RoomTypeModule } from './room-type/room-type.module';
+import { RoomChargeModule } from './room-charge/room-charge.module';
+import { RoomAmenityModule } from './room-amenity/room-amenity.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -72,6 +75,9 @@ import { PurchaseModule } from './purchase/purchase.module';
     ClientAuthModule,
     ClientAccountModule,
     PurchaseModule,
+    RoomTypeModule,
+    RoomChargeModule,
+    RoomAmenityModule,
   ],
 })
 export class AppModule {}
