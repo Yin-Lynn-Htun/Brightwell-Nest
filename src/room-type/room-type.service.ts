@@ -23,12 +23,12 @@ export class RoomTypeService {
     const amenityList = await Promise.all(
       amenities.map(async (amenity) => {
         if (isNaN(amenity as any)) {
-          return await this.roomAmenityRespository.create(amenity);
+          return await this.roomAmenityRespository.create({ name: amenity });
         } else {
           const val = await this.roomAmenityRespository.findOne(+amenity);
 
           if (!val) {
-            return await this.roomAmenityRespository.create(amenity);
+            return await this.roomAmenityRespository.create({ name: amenity });
           }
           return val;
         }
@@ -37,10 +37,10 @@ export class RoomTypeService {
 
     const chargeList: RoomCharge[] = [];
 
-    charges.forEach(async (item) => {
-      const charge = await this.roomChargeRespository.create(item);
-      chargeList.push(charge);
-    });
+    for (const charge of charges) {
+      const c = await this.roomChargeRespository.create(charge);
+      chargeList.push(c);
+    }
 
     const roomType = this.roomTypeRespository.create({
       name: createRoomTypeDto.name,
@@ -52,11 +52,16 @@ export class RoomTypeService {
     return await this.roomTypeRespository.save(roomType);
   }
 
-  findAll() {
-    return `This action returns all roomType`;
+  async findAll() {
+    return await this.roomTypeRespository.find({
+      relations: {
+        amenities: true,
+        charges: true,
+      },
+    });
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return `This action returns a #${id} roomType`;
   }
 

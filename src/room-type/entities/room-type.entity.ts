@@ -4,12 +4,14 @@ import { RoomCharge } from 'src/room-charge/entities/room-charge.entity';
 import {
   Column,
   CreateDateColumn,
+  Entity,
   JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+@Entity()
 export class RoomType {
   @PrimaryGeneratedColumn()
   id: number;

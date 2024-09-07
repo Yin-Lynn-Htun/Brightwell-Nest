@@ -13,8 +13,8 @@ export class RoomAmenityService {
   ) {}
 
   async create(createRoomAmenityDto: CreateRoomAmenityDto) {
-    const tag = this.amenityRepository.create(createRoomAmenityDto);
-    return await this.amenityRepository.save(tag);
+    const amenity = this.amenityRepository.create(createRoomAmenityDto);
+    return await this.amenityRepository.save(amenity);
   }
 
   async findAll() {
