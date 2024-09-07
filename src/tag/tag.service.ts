@@ -13,7 +13,7 @@ export class TagService {
   ) {}
 
   async create(createTagDto: CreateTagDto) {
-    const tag = await this.tagRepository.create(createTagDto);
+    const tag = this.tagRepository.create(createTagDto);
     return await this.tagRepository.save(tag);
   }
 

@@ -1,15 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoomChargeDto } from './dto/create-room-charge.dto';
 import { UpdateRoomChargeDto } from './dto/update-room-charge.dto';
+import { Repository } from 'typeorm';
+import { RoomCharge } from './entities/room-charge.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class RoomChargeService {
-  create(createRoomChargeDto: CreateRoomChargeDto) {
-    return 'This action adds a new roomCharge';
+  constructor(
+    @InjectRepository(RoomCharge)
+    private roomChargeRepository: Repository<RoomCharge>,
+  ) {}
+
+  async create(createRoomChargeDto: CreateRoomChargeDto) {
+    const tag = this.roomChargeRepository.create(createRoomChargeDto);
+    return await this.roomChargeRepository.save(tag);
   }
 
-  findAll() {
-    return `This action returns all roomCharge`;
+  async findAll() {
+    return await this.roomChargeRepository.find();
   }
 
   findOne(id: number) {
