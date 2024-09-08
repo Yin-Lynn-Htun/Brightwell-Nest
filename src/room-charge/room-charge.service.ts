@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomChargeDto } from './dto/create-room-charge.dto';
 import { UpdateRoomChargeDto } from './dto/update-room-charge.dto';
 import { Repository } from 'typeorm';
@@ -21,15 +21,35 @@ export class RoomChargeService {
     return await this.roomChargeRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} roomCharge`;
+  async findOne(id: number) {
+    return await this.roomChargeRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateRoomChargeDto: UpdateRoomChargeDto) {
-    return `This action updates a #${id} roomCharge`;
+  async update(id: number, updateRoomChargeDto: UpdateRoomChargeDto) {
+    const roomCharge = await this.roomChargeRepository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!roomCharge) {
+      throw new NotFoundException();
+    }
+
+    Object.assign(roomCharge, updateRoomChargeDto);
+
+    return await this.roomChargeRepository.save(roomCharge);
   }
 
   remove(id: number) {
     return `This action removes a #${id} roomCharge`;
+  }
+
+  async removeWithEntity(item: RoomCharge) {
+    return await this.roomChargeRepository.remove(item);
   }
 }

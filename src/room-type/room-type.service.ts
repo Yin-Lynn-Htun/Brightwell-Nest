@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomTypeDto } from './dto/create-room-type.dto';
 import { UpdateRoomTypeDto } from './dto/update-room-type.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,13 +22,17 @@ export class RoomTypeService {
 
     const amenityList = await Promise.all(
       amenities.map(async (amenity) => {
-        if (isNaN(amenity as any)) {
-          return await this.roomAmenityRespository.create({ name: amenity });
+        if (!amenity.id) {
+          return await this.roomAmenityRespository.create({
+            name: amenity.name,
+          });
         } else {
-          const val = await this.roomAmenityRespository.findOne(+amenity);
+          const val = await this.roomAmenityRespository.findOne(+amenity.id);
 
           if (!val) {
-            return await this.roomAmenityRespository.create({ name: amenity });
+            return await this.roomAmenityRespository.create({
+              name: amenity.name,
+            });
           }
           return val;
         }
@@ -73,8 +77,101 @@ export class RoomTypeService {
     });
   }
 
-  update(id: number, updateRoomTypeDto: UpdateRoomTypeDto) {
-    return `This action updates a #${id} roomType`;
+  async update(id: number, updateRoomTypeDto: UpdateRoomTypeDto) {
+    const roomType = await this.roomTypeRespository.findOne({
+      where: {
+        id,
+      },
+    });
+
+    if (!roomType) {
+      throw new NotFoundException();
+    }
+
+    if (updateRoomTypeDto.name) {
+      roomType.name = updateRoomTypeDto.name;
+    }
+
+    if (updateRoomTypeDto.description) {
+      roomType.description = updateRoomTypeDto.description;
+    }
+
+    // amenities start
+    const incomingAmenities = updateRoomTypeDto.amenities ?? [];
+    const updatedAmenities = [];
+
+    for (const amenity of incomingAmenities) {
+      if (amenity.id) {
+        const item = await this.roomAmenityRespository.findOne(amenity.id);
+
+        if (!item) {
+          throw new NotFoundException();
+        }
+
+        updatedAmenities.push(item);
+      } else {
+        const item = await this.roomAmenityRespository.create({
+          name: amenity.name,
+        });
+        updatedAmenities.push(item);
+      }
+    }
+    roomType.amenities = updatedAmenities;
+    // amenities end
+
+    // charges start
+    const incomingCharges = updateRoomTypeDto.charges ?? [];
+    const existingCharges = roomType.charges ?? [];
+
+    // remove charge items
+    const incomingChargeIds = incomingCharges
+      ?.filter((i) => i.id)
+      .map((i) => i.id);
+
+    const chargesToRemove = existingCharges.filter(
+      (e) => !incomingChargeIds?.includes(+e.id),
+    );
+
+    if (chargesToRemove.length > 0) {
+      for (const id of chargesToRemove) {
+        this.roomChargeRespository.removeWithEntity(id);
+      }
+    }
+
+    // charge to insert
+
+    const updatedCharges = [];
+    for (const charge of incomingCharges) {
+      // insert
+      if (!charge.id) {
+        const c = await this.roomChargeRespository.create(charge);
+        updatedCharges.push(c);
+      } else {
+        const foundCharge = await this.roomChargeRespository.findOne(id);
+
+        if (!foundCharge) {
+          throw new NotFoundException();
+        }
+
+        if (foundCharge?.price === charge.price) {
+          updatedCharges.push(foundCharge);
+        } else {
+          // need to update
+          const updatedItem = await this.roomChargeRespository.update(
+            charge.id,
+            {
+              ...charge,
+            },
+          );
+
+          updatedCharges.push(updatedItem);
+        }
+      }
+    }
+    roomType.charges = updatedCharges;
+    // charges end
+
+    this.roomTypeRespository.save(roomType);
   }
 
   remove(id: number) {
