@@ -1,6 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { RoomAmenity } from 'src/room-amenity/entities/room-amenity.entity';
 import { RoomCharge } from 'src/room-charge/entities/room-charge.entity';
+import { Room } from 'src/room/entities/room.entity';
 import {
   Column,
   CreateDateColumn,
@@ -29,6 +30,9 @@ export class RoomType {
   @ManyToMany(() => RoomAmenity)
   @JoinTable()
   amenities: RoomAmenity[];
+
+  @OneToMany(() => Room, (room) => room.roomType)
+  rooms: Room[];
 
   @CreateDateColumn()
   created_at: Date;
