@@ -32,8 +32,20 @@ export class RoomService {
     return await this.roomRespository.save(room);
   }
 
-  async findAll() {
-    return await this.roomRespository.find();
+  async findAll(roomTypeId?: number) {
+    if (roomTypeId) {
+      // Filter by room type if roomTypeId is provided
+      return await this.roomRespository.find({
+        where: { roomType: { id: roomTypeId } },
+        relations: ['roomType'],
+      });
+    }
+
+    return await this.roomRespository.find({
+      relations: {
+        roomType: true,
+      },
+    });
   }
 
   async findOne(id: number) {

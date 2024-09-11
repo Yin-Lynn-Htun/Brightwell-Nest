@@ -22,6 +22,11 @@ export enum PurchaseStatus {
   CANCELLED = 'Cancelled',
 }
 
+export enum RoomBookingStatus {
+  BOOKED = 'Booked',
+  CANCELED = 'Canceled',
+}
+
 export const DayOfWeeks = [
   'Sunday',
   'Monday',

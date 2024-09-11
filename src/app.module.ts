@@ -31,6 +31,7 @@ import { RoomTypeModule } from './room-type/room-type.module';
 import { RoomChargeModule } from './room-charge/room-charge.module';
 import { RoomAmenityModule } from './room-amenity/room-amenity.module';
 import { RoomModule } from './room/room.module';
+import { RoomBookingModule } from './room-booking/room-booking.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -80,6 +81,7 @@ import { RoomModule } from './room/room.module';
     RoomChargeModule,
     RoomAmenityModule,
     RoomModule,
+    RoomBookingModule,
   ],
 })
 export class AppModule {}
