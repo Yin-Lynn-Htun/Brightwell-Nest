@@ -41,6 +41,12 @@ export class ClientAccountController {
     return this.clientAccountService.getPackages(req.user.id);
   }
 
+  @Get('/rooms')
+  @UseGuards(JwtAuthGuard)
+  rooms(@Req() req: Request & { user: { id: number } }) {
+    return this.clientAccountService.getRooms(req.user.id);
+  }
+
   // @Post()
   // create(@Body() createClientAccountDto: CreateClientAccountDto) {
   //   return this.clientAccountService.create(createClientAccountDto);

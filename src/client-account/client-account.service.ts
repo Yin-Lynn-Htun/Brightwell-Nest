@@ -87,4 +87,15 @@ export class ClientAccountService {
 
     return data?.purchases ?? [];
   }
+
+  async getRooms(patientId: number) {
+    const data = await this.patientsRespository.findOne({
+      where: {
+        id: patientId,
+      },
+      relations: ['bookedRooms', 'bookedRooms.room'],
+    });
+
+    return data?.bookedRooms ?? [];
+  }
 }
