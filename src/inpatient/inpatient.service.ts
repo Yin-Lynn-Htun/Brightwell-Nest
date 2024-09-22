@@ -10,6 +10,8 @@ import { RoomTypeService } from 'src/room-type/room-type.service';
 import { InpatientStatus } from 'src/constants';
 import { RoomService } from 'src/room/room.service';
 import { RoomStatus } from 'src/room/entities/room.entity';
+import { TransactionService } from 'src/transaction/transaction.service';
+import { TransactionType } from 'src/transaction/entities/transaction.entity';
 
 @Injectable()
 export class InpatientService {
@@ -19,6 +21,7 @@ export class InpatientService {
     private readonly patientService: PatientsService,
     private readonly roomTypeService: RoomTypeService,
     private readonly roomService: RoomService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -60,12 +63,17 @@ export class InpatientService {
   }
 
   @UseGuards(JwtAuthGuard)
-  async payDeposit(inpatientId: number, transactionId: number) {
+  async payDeposit(inpatientId: number) {
     const inpatient = await this.findOne(inpatientId);
     if (!inpatient) throw new NotFoundException('Inpatient not found!');
 
-    inpatient.status = InpatientStatus.ADMITTED;
+    await this.transactionService.create(inpatient.patient.id, {
+      amount: 1000,
+      referenceId: inpatient.id,
+      type: TransactionType.INPATIENT,
+    });
 
+    inpatient.status = InpatientStatus.ADMITTED;
     await this.inpatientRepository.save(inpatient);
   }
 

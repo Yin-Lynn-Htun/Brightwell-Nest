@@ -6,6 +6,7 @@ import { Inpatient } from './entities/inpatient.entity';
 import { PatientsModule } from 'src/patients/patients.module';
 import { RoomModule } from 'src/room/room.module';
 import { RoomTypeModule } from 'src/room-type/room-type.module';
+import { TransactionModule } from 'src/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { RoomTypeModule } from 'src/room-type/room-type.module';
     PatientsModule,
     RoomModule,
     RoomTypeModule,
+    TransactionModule,
   ],
   controllers: [InpatientController],
   providers: [InpatientService],

@@ -50,11 +50,11 @@ export class InpatientController {
     return this.inpatientService.cancelRoom(+id);
   }
 
-  // @Patch(':id/confirm-room')
-  // @UseGuards(JwtAuthGuard)
-  // confirmRoom(@Param('id') id: string, @Body() assignRoomDto: AssignRoomDto) {
-  //   return this.inpatientService.confirmRoom(+id, assignRoomDto);
-  // }
+  @Patch(':id/pay-deposit')
+  @UseGuards(JwtAuthGuard)
+  payDeposit(@Param('id') id: string, @Body() assignRoomDto: AssignRoomDto) {
+    return this.inpatientService.payDeposit(+id);
+  }
 
   @Patch(':id')
   update(

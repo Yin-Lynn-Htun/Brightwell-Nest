@@ -1,1 +1,10 @@
-export class CreateTransactionDto {}
+import {
+  TransactionStatus,
+  TransactionType,
+} from '../entities/transaction.entity';
+
+export class CreateTransactionDto {
+  amount: number;
+  type: TransactionType;
+  referenceId: number;
+}

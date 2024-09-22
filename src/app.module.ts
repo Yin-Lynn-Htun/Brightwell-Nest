@@ -33,6 +33,8 @@ import { RoomAmenityModule } from './room-amenity/room-amenity.module';
 import { RoomModule } from './room/room.module';
 import { InpatientModule } from './inpatient/inpatient.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { InpatientChargeModule } from './inpatient-charge/inpatient-charge.module';
+import { DepositModule } from './deposit/deposit.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -84,6 +86,8 @@ import { TransactionModule } from './transaction/transaction.module';
     RoomModule,
     InpatientModule,
     TransactionModule,
+    InpatientChargeModule,
+    DepositModule,
   ],
 })
 export class AppModule {}
