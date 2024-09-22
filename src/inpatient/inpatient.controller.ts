@@ -1,3 +1,4 @@
+import { DepositService } from './../deposit/deposit.service';
 import {
   Controller,
   Get,
@@ -16,7 +17,10 @@ import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 
 @Controller('inpatient')
 export class InpatientController {
-  constructor(private readonly inpatientService: InpatientService) {}
+  constructor(
+    private readonly inpatientService: InpatientService,
+    private readonly depositService: DepositService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard)

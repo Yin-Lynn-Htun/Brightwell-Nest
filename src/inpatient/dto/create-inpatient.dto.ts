@@ -5,4 +5,5 @@ export class CreateInpatientDto {
 
 export class AssignRoomDto {
   roomId: number;
+  depositAmount: number;
 }

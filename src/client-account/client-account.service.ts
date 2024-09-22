@@ -93,7 +93,12 @@ export class ClientAccountService {
       where: {
         id: patientId,
       },
-      relations: ['inpatients', 'inpatients.room', 'inpatients.roomType'],
+      relations: [
+        'inpatients',
+        'inpatients.room',
+        'inpatients.roomType',
+        'inpatients.deposits',
+      ],
     });
 
     return data?.inpatients ?? [];

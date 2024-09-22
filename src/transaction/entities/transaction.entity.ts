@@ -12,6 +12,7 @@ export enum TransactionType {
   PACKAGE = 'Package',
   APPOINTMENT = 'Appointment',
   INPATIENT = 'Inpatient',
+  DEPOSIT = 'Deposit',
 }
 
 @Entity('transaction')

@@ -115,5 +115,5 @@ export class Patient {
   inpatients: Inpatient[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.patient)
-  transactions: Inpatient[];
+  transactions: Transaction[];
 }

@@ -1,4 +1,6 @@
 import { InpatientStatus } from 'src/constants';
+import { Deposit } from 'src/deposit/entities/deposit.entity';
+import { InpatientCharge } from 'src/inpatient-charge/entities/inpatient-charge.entity';
 import { Package } from 'src/package/entities/package.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
 import { RoomType } from 'src/room-type/entities/room-type.entity';
@@ -8,6 +10,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -37,11 +40,15 @@ export class Inpatient {
   @Column({ type: 'enum', enum: InpatientStatus })
   status: InpatientStatus;
 
-  // TODO: Transcation
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => Deposit, (deposit) => deposit.inpatient)
+  deposits: Deposit[];
+
+  @OneToMany(() => InpatientCharge, (charge) => charge.inpatient)
+  charges: InpatientCharge[];
 }

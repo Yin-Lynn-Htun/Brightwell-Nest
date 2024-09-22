@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
+import { DepositService } from './../deposit/deposit.service';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UseGuards,
+  forwardRef,
+} from '@nestjs/common';
 import { CreateInpatientDto, AssignRoomDto } from './dto/create-inpatient.dto';
 import { UpdateInpatientDto } from './dto/update-inpatient.dto';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
@@ -22,6 +29,8 @@ export class InpatientService {
     private readonly roomTypeService: RoomTypeService,
     private readonly roomService: RoomService,
     private readonly transactionService: TransactionService,
+    @Inject(forwardRef(() => DepositService))
+    private readonly depositService: DepositService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -67,11 +76,16 @@ export class InpatientService {
     const inpatient = await this.findOne(inpatientId);
     if (!inpatient) throw new NotFoundException('Inpatient not found!');
 
+    const deposit = inpatient.deposits?.[0];
+    if (!deposit) throw new NotFoundException('deposit not found!');
+
     await this.transactionService.create(inpatient.patient.id, {
-      amount: 1000,
-      referenceId: inpatient.id,
-      type: TransactionType.INPATIENT,
+      amount: deposit.amount,
+      referenceId: deposit.id,
+      type: TransactionType.DEPOSIT,
     });
+
+    // TODO: Change deposit status to Success
 
     inpatient.status = InpatientStatus.ADMITTED;
     await this.inpatientRepository.save(inpatient);
@@ -88,13 +102,13 @@ export class InpatientService {
       where: {
         id,
       },
-      relations: ['patient', 'roomType', 'room'],
+      relations: ['patient', 'roomType', 'room', 'deposits'],
     });
   }
 
   @UseGuards(JwtAuthGuard)
   async assignRoom(inpatientId: number, assignRoomDto: AssignRoomDto) {
-    const { roomId } = assignRoomDto;
+    const { roomId, depositAmount } = assignRoomDto;
 
     const inpatient = await this.findOne(inpatientId);
     if (!inpatient) throw new NotFoundException('Inpatient not found!');
@@ -105,6 +119,11 @@ export class InpatientService {
 
     inpatient.room = room;
     inpatient.status = InpatientStatus.PENDING_DEPOSIT;
+
+    this.depositService.create({
+      amount: depositAmount,
+      inpatientId: inpatientId,
+    });
 
     return this.inpatientRepository.save(inpatient);
   }
