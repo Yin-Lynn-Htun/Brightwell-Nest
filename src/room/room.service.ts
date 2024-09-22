@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { Room } from './entities/room.entity';
+import { Room, RoomStatus } from './entities/room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RoomTypeService } from 'src/room-type/room-type.service';
@@ -32,20 +32,21 @@ export class RoomService {
     return await this.roomRespository.save(room);
   }
 
-  async findAll(roomTypeId?: number) {
-    if (roomTypeId) {
-      // Filter by room type if roomTypeId is provided
-      return await this.roomRespository.find({
-        where: { roomType: { id: roomTypeId } },
-        relations: ['roomType'],
-      });
+  async findAll(roomType?: string, status?: string): Promise<Room[]> {
+    const queryBuilder = this.roomRespository.createQueryBuilder('room');
+
+    // Apply roomType filter if provided
+    if (roomType) {
+      queryBuilder.andWhere('room.roomType = :roomType', { roomType });
     }
 
-    return await this.roomRespository.find({
-      relations: {
-        roomType: true,
-      },
-    });
+    // Apply status filter if provided
+    if (status) {
+      queryBuilder.andWhere('room.status = :status', { status });
+    }
+
+    // Return all rooms or filtered rooms based on the query
+    return queryBuilder.getMany();
   }
 
   async findOne(id: number) {
@@ -83,5 +84,13 @@ export class RoomService {
     }
 
     return this.roomRespository.delete(room);
+  }
+
+  async getAvailableRoom() {
+    return await this.roomRespository.find({
+      where: {
+        status: RoomStatus.Available,
+      },
+    });
   }
 }

@@ -93,9 +93,9 @@ export class ClientAccountService {
       where: {
         id: patientId,
       },
-      relations: ['bookedRooms', 'bookedRooms.room'],
+      relations: ['inpatients', 'inpatients.room', 'inpatients.roomType'],
     });
 
-    return data?.bookedRooms ?? [];
+    return data?.inpatients ?? [];
   }
 }

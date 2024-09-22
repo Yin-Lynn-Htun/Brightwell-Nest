@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { RoomBooking } from 'src/room-booking/entities/room-booking.entity';
+import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
 import { RoomCharge } from 'src/room-charge/entities/room-charge.entity';
 import { RoomType } from 'src/room-type/entities/room-type.entity';
 import {
@@ -7,11 +7,10 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-export enum RoomTypeStatus {
+export enum RoomStatus {
   Available = 'Available',
   Occupied = 'Occupied',
 }
@@ -33,14 +32,14 @@ export class Room {
 
   @Column({
     type: 'enum',
-    enum: RoomTypeStatus,
-    default: RoomTypeStatus.Available,
+    enum: RoomStatus,
+    default: RoomStatus.Available,
   })
-  status: RoomType;
+  status: RoomStatus;
 
   @CreateDateColumn()
   created_at: Date;
 
-  @ManyToOne(() => RoomBooking)
-  bookings: RoomBooking[];
+  @ManyToOne(() => Inpatient)
+  inpatients: Inpatient[];
 }

@@ -1,4 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
+import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
 import { RoomAmenity } from 'src/room-amenity/entities/room-amenity.entity';
 import { RoomCharge } from 'src/room-charge/entities/room-charge.entity';
 import { Room } from 'src/room/entities/room.entity';
@@ -33,6 +34,9 @@ export class RoomType {
 
   @OneToMany(() => Room, (room) => room.roomType)
   rooms: Room[];
+
+  @OneToMany(() => Inpatient, (roomType) => roomType.roomType)
+  inpatients: Inpatient[];
 
   @CreateDateColumn()
   created_at: Date;

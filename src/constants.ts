@@ -22,9 +22,13 @@ export enum PurchaseStatus {
   CANCELLED = 'Cancelled',
 }
 
-export enum RoomBookingStatus {
-  BOOKED = 'Booked',
-  CANCELED = 'Canceled',
+export enum InpatientStatus {
+  REQUESTED = 'Requested',
+  ADMITTED = 'Admitted',
+  PENDING_DEPOSIT = 'Pending Deposit',
+  IN_TREATMENT = 'Ongoing',
+  DISCHARGED = 'Discharged',
+  CANCELLED = 'Cancelled',
 }
 
 export const DayOfWeeks = [

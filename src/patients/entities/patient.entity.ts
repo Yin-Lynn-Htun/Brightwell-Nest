@@ -10,7 +10,8 @@ import {
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Purchase } from 'src/purchase/entities/purchase.entity';
-import { RoomBooking } from 'src/room-booking/entities/room-booking.entity';
+import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
 
 export enum Gender {
   Male = 'Male',
@@ -110,6 +111,9 @@ export class Patient {
   @OneToMany(() => Purchase, (purchase) => purchase.patient)
   purchases: Purchase[];
 
-  @OneToMany(() => RoomBooking, (roomBooking) => roomBooking.patient)
-  bookedRooms: RoomBooking[];
+  @OneToMany(() => Inpatient, (inpatient) => inpatient.patient)
+  inpatients: Inpatient[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.patient)
+  transactions: Inpatient[];
 }
