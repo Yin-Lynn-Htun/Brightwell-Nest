@@ -57,7 +57,7 @@ export class InpatientController {
   @Patch(':id/pay-deposit')
   @UseGuards(JwtAuthGuard)
   payDeposit(@Param('id') id: string, @Body() assignRoomDto: AssignRoomDto) {
-    return this.inpatientService.payDeposit(+id);
+    return this.inpatientService.payRoomDeposit(+id);
   }
 
   @Patch(':id')

@@ -1,18 +1,7 @@
 import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-export enum DepositStatus {
-  PENDING = 'Pending',
-  SUCCESS = 'Success',
-}
-
-export enum TransactionType {
-  PACKAGE = 'Package',
-  APPOINTMENT = 'Appointment',
-  INPATIENT = 'Inpatient',
-}
-
-@Entity('deposit')
+@Entity('inpatient-charge')
 export class InpatientCharge {
   @PrimaryGeneratedColumn()
   id: number;

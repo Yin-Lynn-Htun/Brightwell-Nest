@@ -32,7 +32,7 @@ export class InpatientService {
     private readonly roomService: RoomService,
     private readonly transactionService: TransactionService,
     @Inject(forwardRef(() => DepositService))
-    private readonly depositService: DepositService, 
+    private readonly depositService: DepositService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -74,7 +74,34 @@ export class InpatientService {
   }
 
   @UseGuards(JwtAuthGuard)
-  async payDeposit(inpatientId: number) {
+  async confirmRoom(inpatientId: number) {
+    const inpatient = await this.findOne(inpatientId);
+    if (!inpatient) throw new NotFoundException('Inpatient not found!');
+
+    const deposit = inpatient.deposits?.[0];
+    if (!deposit) throw new NotFoundException('deposit not found!');
+
+    const transaction = await this.transactionService.create(
+      inpatient.patient.id,
+      {
+        amount: deposit.amount,
+        referenceId: deposit.id,
+        type: TransactionType.DEPOSIT,
+      },
+    );
+
+    // TODO: Change deposit status to Success
+    this.depositService.update(deposit.id, {
+      transactionId: transaction.id,
+      status: DepositStatus.SUCCESS,
+    });
+
+    inpatient.status = InpatientStatus.ADMITTED;
+    await this.inpatientRepository.save(inpatient);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  async payRoomDeposit(inpatientId: number) {
     const inpatient = await this.findOne(inpatientId);
     if (!inpatient) throw new NotFoundException('Inpatient not found!');
 
@@ -111,7 +138,14 @@ export class InpatientService {
       where: {
         id,
       },
-      relations: ['patient', 'roomType', 'room', 'deposits', 'charges'],
+      relations: [
+        'patient',
+        'roomType',
+        'roomType.charges',
+        'room',
+        'deposits',
+        'charges',
+      ],
     });
   }
 
@@ -133,10 +167,6 @@ export class InpatientService {
       amount: depositAmount,
       inpatientId: inpatientId,
     });
-
-    return this.inpatientRepository.save(inpatient);
-  }
- 
 
     return this.inpatientRepository.save(inpatient);
   }

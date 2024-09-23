@@ -10,6 +10,7 @@ import { InpatientCharge } from './entities/inpatient-charge.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InpatientService } from 'src/inpatient/inpatient.service';
+import { CreateAdditionalChargeDto } from './dto/create-additional-charge.dto';
 
 @Injectable()
 export class InpatientChargeService {
@@ -33,11 +34,28 @@ export class InpatientChargeService {
     return await this.inpatientChargeRepository.save(inpatientCharge);
   }
 
+  async hasChargeForToday(inpatientId: number): Promise<boolean> {
+    const today = new Date();
+
+    const record = await this.inpatientChargeRepository
+      .createQueryBuilder('inpatientCharge')
+      .where('DATE(inpatientCharge.createdAt) = :today', {
+        today: today.toISOString().split('T')[0],
+      })
+      .andWhere('inpatientCharge.inpatientId = :inpatientId', { inpatientId })
+      .getOne();
+
+    return !!record; // returns true if a record exists for the given inpatient today
+  }
+
   async addRoomCharges(inpatientId: number) {
     const inpatient = await this.inpatientRepository.findOne(inpatientId);
     if (!inpatient) throw new NotFoundException('Inpatient not found!');
 
-    const roomCharges = inpatient.roomType.charges;
+    if (await this.hasChargeForToday(inpatientId))
+      throw new NotFoundException('You have already charged for today!');
+
+    const roomCharges = inpatient.roomType.charges ?? [];
 
     for (const charge of roomCharges) {
       await this.create({
@@ -46,6 +64,23 @@ export class InpatientChargeService {
         inpatientId: inpatient.id,
       });
     }
+  }
+
+  async addAdditionalCharges(
+    inpatientId: number,
+    createAdditionalChargeDto: CreateAdditionalChargeDto,
+  ) {
+    const {
+      charges: { amount, description },
+    } = createAdditionalChargeDto;
+    const inpatient = await this.inpatientRepository.findOne(inpatientId);
+    if (!inpatient) throw new NotFoundException('Inpatient not found!');
+
+    return await this.create({
+      amount,
+      description,
+      inpatientId,
+    });
   }
 
   findAll() {

@@ -47,6 +47,17 @@ export class ClientAccountController {
     return this.clientAccountService.getRooms(req.user.id);
   }
 
+  @Get('/pending-deposits')
+  @UseGuards(JwtAuthGuard)
+  pendingDeposits(@Req() req: Request & { user: { id: number } }) {
+    return this.clientAccountService.getPendingDeposits(req.user.id);
+  }
+
+  // @Get(':id/pending-deposits')
+  // async getPendingDeposits(@Param('id', ParseIntPipe) patientId: number): Promise<Deposit[]> {
+  //   return this.patientService.getPendingDeposits(patientId);
+  // }
+
   // @Post()
   // create(@Body() createClientAccountDto: CreateClientAccountDto) {
   //   return this.clientAccountService.create(createClientAccountDto);

@@ -6,12 +6,6 @@ export enum DepositStatus {
   SUCCESS = 'Success',
 }
 
-export enum TransactionType {
-  PACKAGE = 'Package',
-  APPOINTMENT = 'Appointment',
-  INPATIENT = 'Inpatient',
-}
-
 @Entity('deposit')
 export class Deposit {
   @PrimaryGeneratedColumn()

@@ -6,6 +6,7 @@ import { Patient } from 'src/patients/entities/patient.entity';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
 import { AppointmentStatus } from 'src/constants';
+import { Deposit, DepositStatus } from 'src/deposit/entities/deposit.entity';
 
 @Injectable()
 export class ClientAccountService {
@@ -102,5 +103,31 @@ export class ClientAccountService {
     });
 
     return data?.inpatients ?? [];
+  }
+
+  async getPendingDeposits(patientId: number) {
+    return (
+      this.patientsRespository
+        .createQueryBuilder('patient') // Use createQueryBuilder on patientRepository
+        .leftJoinAndSelect('patient.inpatients', 'inpatient')
+        .leftJoinAndSelect('inpatient.deposits', 'deposit')
+        .where('patient.id = :patientId', { patientId })
+        .andWhere('deposit.status = :status', { status: DepositStatus.PENDING })
+        // .select([
+        //   'inpatient.deposit.id',
+        //   'inpatient.deposit.amount',
+        //   'inpatient.deposit.createdAt',
+        //   'inpatient.deposit.status',
+        // ])
+        .select([
+          'patient.id as patient_id',
+          'inpatient.id as inpatient_id',
+          'deposit.id as deposit_id',
+          'deposit.amount as amount',
+          'deposit.createdAt as created_at',
+          'deposit.status as status',
+        ])
+        .getRawMany()
+    );
   }
 }

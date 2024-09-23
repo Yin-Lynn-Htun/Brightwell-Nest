@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { DepositService } from './deposit.service';
 import { CreateDepositDto } from './dto/create-deposit.dto';
 import { UpdateDepositDto } from './dto/update-deposit.dto';
+import { DepositStatus } from './entities/deposit.entity';
+import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 
 @Controller('deposit')
 export class DepositController {
@@ -25,6 +37,16 @@ export class DepositController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDepositDto: UpdateDepositDto) {
     return this.depositService.update(+id, updateDepositDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/pay-deposit')
+  payDeposit(
+    @Req() req: Request & { user: { id: string } },
+    @Param('id') depositId: string,
+  ) {
+    const patientId = +req.user?.id;
+    return this.depositService.payDeposit(patientId, +depositId);
   }
 
   @Delete(':id')
