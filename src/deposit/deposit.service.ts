@@ -38,12 +38,18 @@ export class DepositService {
     return `This action returns all deposit`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} deposit`;
+  async findOne(id: number) {
+    return await this.depositRepository.findOneBy({
+      id,
+    });
   }
 
-  update(id: number, updateDepositDto: UpdateDepositDto) {
-    return `This action updates a #${id} deposit`;
+  async update(id: number, updateDepositDto: UpdateDepositDto) {
+    const deposit = await this.findOne(id);
+    if (!deposit) throw new NotFoundException('Deposit not found!');
+
+    Object.assign(deposit, updateDepositDto);
+    return await this.depositRepository.save(deposit);
   }
 
   remove(id: number) {

@@ -19,6 +19,8 @@ import { RoomService } from 'src/room/room.service';
 import { RoomStatus } from 'src/room/entities/room.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
 import { TransactionType } from 'src/transaction/entities/transaction.entity';
+import { DepositStatus } from 'src/deposit/entities/deposit.entity';
+import { InpatientChargeService } from 'src/inpatient-charge/inpatient-charge.service';
 
 @Injectable()
 export class InpatientService {
@@ -30,7 +32,7 @@ export class InpatientService {
     private readonly roomService: RoomService,
     private readonly transactionService: TransactionService,
     @Inject(forwardRef(() => DepositService))
-    private readonly depositService: DepositService,
+    private readonly depositService: DepositService, 
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -79,13 +81,20 @@ export class InpatientService {
     const deposit = inpatient.deposits?.[0];
     if (!deposit) throw new NotFoundException('deposit not found!');
 
-    await this.transactionService.create(inpatient.patient.id, {
-      amount: deposit.amount,
-      referenceId: deposit.id,
-      type: TransactionType.DEPOSIT,
-    });
+    const transaction = await this.transactionService.create(
+      inpatient.patient.id,
+      {
+        amount: deposit.amount,
+        referenceId: deposit.id,
+        type: TransactionType.DEPOSIT,
+      },
+    );
 
     // TODO: Change deposit status to Success
+    this.depositService.update(deposit.id, {
+      transactionId: transaction.id,
+      status: DepositStatus.SUCCESS,
+    });
 
     inpatient.status = InpatientStatus.ADMITTED;
     await this.inpatientRepository.save(inpatient);
@@ -102,7 +111,7 @@ export class InpatientService {
       where: {
         id,
       },
-      relations: ['patient', 'roomType', 'room', 'deposits'],
+      relations: ['patient', 'roomType', 'room', 'deposits', 'charges'],
     });
   }
 
@@ -120,10 +129,14 @@ export class InpatientService {
     inpatient.room = room;
     inpatient.status = InpatientStatus.PENDING_DEPOSIT;
 
-    this.depositService.create({
+    await this.depositService.create({
       amount: depositAmount,
       inpatientId: inpatientId,
     });
+
+    return this.inpatientRepository.save(inpatient);
+  }
+ 
 
     return this.inpatientRepository.save(inpatient);
   }

@@ -26,7 +26,7 @@ export class InpatientCharge {
   @Column('text', {
     nullable: true,
   })
-  description: number;
+  description: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
