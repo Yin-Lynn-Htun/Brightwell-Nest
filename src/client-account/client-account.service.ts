@@ -106,28 +106,20 @@ export class ClientAccountService {
   }
 
   async getPendingDeposits(patientId: number) {
-    return (
-      this.patientsRespository
-        .createQueryBuilder('patient') // Use createQueryBuilder on patientRepository
-        .leftJoinAndSelect('patient.inpatients', 'inpatient')
-        .leftJoinAndSelect('inpatient.deposits', 'deposit')
-        .where('patient.id = :patientId', { patientId })
-        .andWhere('deposit.status = :status', { status: DepositStatus.PENDING })
-        // .select([
-        //   'inpatient.deposit.id',
-        //   'inpatient.deposit.amount',
-        //   'inpatient.deposit.createdAt',
-        //   'inpatient.deposit.status',
-        // ])
-        .select([
-          'patient.id as patient_id',
-          'inpatient.id as inpatient_id',
-          'deposit.id as deposit_id',
-          'deposit.amount as amount',
-          'deposit.createdAt as created_at',
-          'deposit.status as status',
-        ])
-        .getRawMany()
-    );
+    return this.patientsRespository
+      .createQueryBuilder('patient') // Use createQueryBuilder on patientRepository
+      .leftJoinAndSelect('patient.inpatients', 'inpatient')
+      .leftJoinAndSelect('inpatient.deposits', 'deposit')
+      .where('patient.id = :patientId', { patientId })
+      .andWhere('deposit.status = :status', { status: DepositStatus.PENDING })
+      .select([
+        'patient.id as patient_id',
+        'inpatient.id as inpatient_id',
+        'deposit.id as deposit_id',
+        'deposit.amount as amount',
+        'deposit.createdAt as created_at',
+        'deposit.status as status',
+      ])
+      .getRawMany();
   }
 }
