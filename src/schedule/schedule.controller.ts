@@ -53,4 +53,9 @@ export class ScheduleController {
   remove(@Param('id') id: string) {
     return this.scheduleService.remove(+id);
   }
+
+  @Get(':scheduleId/slots')
+  async getSlotsForSchedule(@Param('scheduleId') scheduleId: number) {
+    return this.scheduleService.getSlotsForSchedule(scheduleId);
+  }
 }

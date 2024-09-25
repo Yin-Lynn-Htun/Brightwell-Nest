@@ -2,6 +2,7 @@ import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { DayOfWeek } from 'src/constants';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { Room } from 'src/room/entities/room.entity';
+import { Slot } from 'src/slot/entities/slot.entity';
 import {
   Column,
   CreateDateColumn,
@@ -35,8 +36,8 @@ export class Schedule {
   @ManyToOne(() => Room, (room) => room.schedules)
   room: Room;
 
-  @OneToMany(() => Appointment, (appointment) => appointment.schedule)
-  appointments: Appointment[];
+  @OneToMany(() => Slot, (slot) => slot.schedule)
+  slots: Slot[];
 
   @CreateDateColumn()
   createdAt: Date;

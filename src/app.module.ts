@@ -35,6 +35,7 @@ import { InpatientModule } from './inpatient/inpatient.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { InpatientChargeModule } from './inpatient-charge/inpatient-charge.module';
 import { DepositModule } from './deposit/deposit.module';
+import { SlotModule } from './slot/slot.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -88,6 +89,7 @@ import { DepositModule } from './deposit/deposit.module';
     TransactionModule,
     InpatientChargeModule,
     DepositModule,
+    SlotModule,
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
 export class CreateAppointmentDto {
-  scheduleId: number;
+  slotId: number;
   // transcationId: string; later
 }

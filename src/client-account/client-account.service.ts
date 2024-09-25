@@ -22,58 +22,60 @@ export class ClientAccountService {
       },
       relations: [
         'appointments',
-        'appointments.schedule',
-        'appointments.schedule.doctor',
-        'appointments.schedule.doctor.user',
-        'appointments.schedule.doctor.specialties',
+        'appointments.slot',
+        'appointments.slot.schedule.doctor',
+        'appointments.slot.schedule.doctor.user',
+        'appointments.slot.schedule.doctor.specialties',
       ],
     });
 
-    // console.log(patient);
-    // return patient;
+    const groupedAppointments =
+      patient?.appointments.reduce(
+        (acc, appointment) => {
+          const scheduleDate = moment(appointment.slot.schedule.date).format(
+            'ddd, DD MMM YYYY',
+          );
 
-    const groupedAppointments = patient?.appointments.reduce(
-      (acc, appointment) => {
-        const scheduleDate = moment(appointment.schedule.date).format(
-          'ddd, DD MMM YYYY',
-        );
+          // Check if this date already exists in the accumulator
+          const existingGroup = acc.find(
+            (group) => group.date === scheduleDate,
+          );
 
-        // Check if this date already exists in the accumulator
-        const existingGroup = acc.find((group) => group.date === scheduleDate);
+          const appointmentDetails = {
+            doctorName:
+              appointment.slot.schedule.doctor.user.firstName +
+              ' ' +
+              appointment.slot.schedule.doctor.user.lastName,
+            specialties: appointment.slot.schedule.doctor.specialties
+              .map((s) => s.name)
+              .join(', '),
+            time: `${moment(appointment.slot.startTime, 'HH:mm:ss').format('hh:mm A')} - ${moment(appointment.slot.endTime, 'HH:mm:ss').format('hh:mm A')}`,
+            status: appointment.status,
+          };
 
-        const appointmentDetails = {
-          doctorName:
-            appointment.schedule.doctor.user.firstName +
-            ' ' +
-            appointment.schedule.doctor.user.lastName,
-          specialties: appointment.schedule.doctor.specialties
-            .map((s) => s.name)
-            .join(', '),
-          time: `${moment(appointment.schedule.startTime, 'HH:mm:ss').format('hh:mm A')} - ${moment(appointment.schedule.endTime, 'HH:mm:ss').format('hh:mm A')}`,
-          status: appointment.status,
-        };
+          if (existingGroup) {
+            existingGroup.appointments.push(appointmentDetails);
+          } else {
+            acc.push({
+              appointments: [appointmentDetails],
+              date: scheduleDate,
+            });
+          }
 
-        if (existingGroup) {
-          existingGroup.appointments.push(appointmentDetails);
-        } else {
-          acc.push({
-            appointments: [appointmentDetails],
-            date: scheduleDate,
-          });
-        }
+          return acc;
+        },
+        [] as Array<{
+          date: string;
+          appointments: {
+            doctorName: string;
+            specialties: string;
+            time: string;
+            status: AppointmentStatus;
+          }[];
+        }>,
+      ) ?? [];
 
-        return acc;
-      },
-      [] as Array<{
-        date: string;
-        appointments: {
-          doctorName: string;
-          specialties: string;
-          time: string;
-          status: AppointmentStatus;
-        }[];
-      }>,
-    );
+    groupedAppointments.sort((a, b) => moment(b.date).diff(moment(a.date)));
 
     return groupedAppointments;
   }

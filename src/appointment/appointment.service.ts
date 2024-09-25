@@ -7,6 +7,8 @@ import { PatientsService } from 'src/patients/patients.service';
 import { ScheduleService } from 'src/schedule/schedule.service';
 import { AppointmentStatus } from 'src/constants';
 import { InjectRepository } from '@nestjs/typeorm';
+import { SlotService } from 'src/slot/slot.service';
+import { SlotStatus } from 'src/slot/entities/slot.entity';
 
 @Injectable()
 export class AppointmentService {
@@ -14,23 +16,27 @@ export class AppointmentService {
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly patientService: PatientsService,
-    private readonly scheduleService: ScheduleService,
+    private readonly slotService: SlotService,
   ) {}
 
   async create(
     createAppointmentDto: CreateAppointmentDto & { patientId: number },
   ) {
-    const { patientId, scheduleId } = createAppointmentDto;
+    const { patientId, slotId } = createAppointmentDto;
 
     const patient = await this.patientService.findOne(patientId);
-    const schedule = await this.scheduleService.findOne(scheduleId);
+    const slot = await this.slotService.findOne(slotId);
 
-    if (!patient || !schedule) throw new BadRequestException();
+    if (!patient || !slot) throw new BadRequestException();
 
     const appt = this.appointmentRepository.create({
       patient,
-      schedule,
+      slot,
       status: AppointmentStatus.BOOKED,
+    });
+
+    this.slotService.update(slot.id, {
+      status: SlotStatus.Booked,
     });
 
     const data = await this.appointmentRepository.save(appt);

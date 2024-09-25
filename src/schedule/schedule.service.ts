@@ -13,12 +13,18 @@ import { DayOfWeeks } from 'src/constants';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { getWeekDates } from 'src/utils';
 import { RoomService } from 'src/room/room.service';
+import { SlotService } from 'src/slot/slot.service';
+import { Slot, SlotStatus } from 'src/slot/entities/slot.entity';
 
 @Injectable()
 export class ScheduleService {
   constructor(
     @InjectRepository(Schedule)
     private readonly scheduleRepository: Repository<Schedule>,
+
+    @InjectRepository(Slot)
+    private readonly slotRepository: Repository<Slot>,
+
     private readonly doctorRespository: DoctorService,
     private readonly roomRespository: RoomService,
   ) {}
@@ -128,14 +134,52 @@ export class ScheduleService {
           startTime: shift.startTime,
           endTime: shift.endTime,
           room: room,
-          // maxBookings: shift.bookingLimit,
         });
 
-        schedules.push(await this.scheduleRepository.save(schedule));
+        const savedSchedule = await this.scheduleRepository.save(schedule);
+
+        // Generate slots in 10-minute intervals
+        const slots = this.generateSlots(
+          shift.startTime,
+          shift.endTime,
+          savedSchedule,
+        );
+
+        // Save all slots associated with the schedule
+        for (const slot of slots) {
+          await this.slotRepository.save(slot);
+        }
       }
     }
 
     return schedules;
+  }
+
+  // Utility function to generate 10-minute slots for each shift
+  generateSlots(startTime: string, endTime: string, schedule: Schedule) {
+    const slots = [];
+    const slotDuration = 10; // Duration in minutes
+    const start = moment(startTime, 'HH:mm');
+    const end = moment(endTime, 'HH:mm');
+
+    while (start.isBefore(end)) {
+      const nextSlot = start.clone().add(slotDuration, 'minutes');
+
+      // Create slot object
+      const slot = this.slotRepository.create({
+        startTime: start.format('HH:mm'),
+        endTime: nextSlot.format('HH:mm'),
+        status: SlotStatus.Available, // Set initial status
+        schedule: schedule, // Associate with the schedule
+      });
+
+      slots.push(slot);
+
+      // Move to the next 10-minute slot
+      start.add(slotDuration, 'minutes');
+    }
+
+    return slots;
   }
 
   async findAll() {
@@ -147,9 +191,14 @@ export class ScheduleService {
   }
 
   async findByDoctorId(doctorId: number) {
-    return await this.scheduleRepository.findBy({
-      doctor: {
-        doctorId: doctorId,
+    return await this.scheduleRepository.find({
+      where: {
+        doctor: {
+          doctorId: doctorId,
+        },
+      },
+      relations: {
+        slots: true,
       },
     });
   }
@@ -203,5 +252,18 @@ export class ScheduleService {
 
   remove(id: number) {
     return `This action removes a #${id} schedule`;
+  }
+
+  async getSlotsForSchedule(scheduleId: number) {
+    const schedule = await this.scheduleRepository.findOne({
+      where: { id: scheduleId },
+      relations: ['slots'], // Ensure it loads related slots
+    });
+
+    if (!schedule) {
+      throw new NotFoundException(`Schedule with ID ${scheduleId} not found`);
+    }
+
+    return schedule.slots;
   }
 }
