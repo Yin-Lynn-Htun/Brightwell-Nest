@@ -43,7 +43,6 @@ export class InpatientController {
   }
 
   @Patch(':id/assign-room')
-  @UseGuards(JwtAuthGuard)
   assignRoom(@Param('id') id: string, @Body() assignRoomDto: AssignRoomDto) {
     return this.inpatientService.assignRoom(+id, assignRoomDto);
   }
@@ -54,9 +53,15 @@ export class InpatientController {
     return this.inpatientService.cancelRoom(+id);
   }
 
+  @Patch(':id/request-deposit')
+  @UseGuards(JwtAuthGuard)
+  requestDeposit(@Param('id') id: string) {
+    return this.inpatientService.payRoomDeposit(+id);
+  }
+
   @Patch(':id/pay-deposit')
   @UseGuards(JwtAuthGuard)
-  payDeposit(@Param('id') id: string, @Body() assignRoomDto: AssignRoomDto) {
+  payDeposit(@Param('id') id: string) {
     return this.inpatientService.payRoomDeposit(+id);
   }
 

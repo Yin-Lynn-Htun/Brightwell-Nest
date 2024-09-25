@@ -6,5 +6,6 @@ import {
 export class CreateTransactionDto {
   amount: number;
   type: TransactionType;
-  referenceId: number;
+  referenceId?: number;
+  status?: TransactionStatus;
 }

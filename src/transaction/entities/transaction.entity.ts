@@ -13,6 +13,7 @@ export enum TransactionType {
   APPOINTMENT = 'Appointment',
   INPATIENT = 'Inpatient',
   DEPOSIT = 'Deposit',
+  ROOM_DEPOSIT = 'RoomDeposit',
 }
 
 @Entity('transaction')
@@ -40,7 +41,9 @@ export class Transaction {
   type: TransactionType;
 
   // This will be the ID of the related entity (Package, Appointment, or Room Booking)
-  @Column()
+  @Column({
+    nullable: true,
+  })
   referenceId: number;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

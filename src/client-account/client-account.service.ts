@@ -105,6 +105,17 @@ export class ClientAccountService {
     return data?.inpatients ?? [];
   }
 
+  async getPendingTransactions(patientId: number) {
+    const data = await this.patientsRespository.findOne({
+      where: {
+        id: patientId,
+      },
+      relations: ['transactions'],
+    });
+
+    return data?.transactions ?? [];
+  }
+
   async getPendingDeposits(patientId: number) {
     return this.patientsRespository
       .createQueryBuilder('patient') // Use createQueryBuilder on patientRepository

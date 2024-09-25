@@ -6,10 +6,11 @@ export class CreateScheduleDto {
     startTime: string;
     endTime: string;
     dayOfWeek: string;
-    bookingLimit: number;
+    roomId: string;
+    // bookingLimit: number;
   }[];
 
   recurringType: string;
-  recurringEndDate?: string;
+  recurringEndDate: string;
   recurringCount?: string;
 }

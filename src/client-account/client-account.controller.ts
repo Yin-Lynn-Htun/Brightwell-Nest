@@ -47,6 +47,18 @@ export class ClientAccountController {
     return this.clientAccountService.getRooms(req.user.id);
   }
 
+  // @Get('/transactions')
+  // @UseGuards(JwtAuthGuard)
+  // transactions(@Req() req: Request & { user: { id: number } }) {
+  //   return this.clientAccountService.getTransactions(req.user.id);
+  // }
+
+  @Get('/pending-transactions')
+  @UseGuards(JwtAuthGuard)
+  transactions(@Req() req: Request & { user: { id: number } }) {
+    return this.clientAccountService.getPendingTransactions(req.user.id);
+  }
+
   @Get('/pending-deposits')
   @UseGuards(JwtAuthGuard)
   pendingDeposits(@Req() req: Request & { user: { id: number } }) {

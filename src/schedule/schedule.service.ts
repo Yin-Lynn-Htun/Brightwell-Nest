@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { Between, Repository } from 'typeorm';
@@ -8,22 +12,103 @@ import * as moment from 'moment';
 import { DayOfWeeks } from 'src/constants';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { getWeekDates } from 'src/utils';
+import { RoomService } from 'src/room/room.service';
 
 @Injectable()
 export class ScheduleService {
   constructor(
     @InjectRepository(Schedule)
-    private readonly scheduleRespository: Repository<Schedule>,
+    private readonly scheduleRepository: Repository<Schedule>,
     private readonly doctorRespository: DoctorService,
+    private readonly roomRespository: RoomService,
   ) {}
+  // Check if the room is available for a specific time slot on a specific date
+  async isRoomAvailable(
+    roomId: number,
+    startTime: string,
+    endTime: string,
+    date: string, // Specific date to check
+  ): Promise<boolean> {
+    const overlappingSchedule = await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .innerJoinAndSelect('schedule.room', 'room')
+      .where('room.id = :roomId', { roomId })
+      .andWhere('schedule.date = :date', { date }) // Check for specific date
+      .andWhere(
+        '(schedule.startTime < :endTime AND schedule.endTime > :startTime)', // Overlap check
+        { startTime, endTime },
+      )
+      .getOne();
+
+    return !overlappingSchedule; // Return true if no conflicts, false if conflict found
+  }
+
+  // Calculate the specific dates for recurring shifts
+  calculateRecurringDates(
+    startDate: string,
+    endDate: string,
+    dayOfWeek: string,
+  ): string[] {
+    const recurringDates: string[] = [];
+    let currentDate = moment(startDate);
+
+    // Find the first occurrence of the day of the week
+    while (currentDate.format('dddd') !== dayOfWeek) {
+      currentDate = currentDate.add(1, 'day');
+    }
+
+    // Loop through each week between startDate and endDate
+    while (currentDate.isSameOrBefore(moment(endDate))) {
+      recurringDates.push(currentDate.format('YYYY-MM-DD'));
+      currentDate = currentDate.add(1, 'week');
+    }
+
+    return recurringDates;
+  }
+
+  // Validate room availability for all recurring shifts
+  async validateRoomAvailability(
+    shifts: any[],
+    startDate: string,
+    endDate: string,
+  ): Promise<void> {
+    for (const shift of shifts) {
+      // Calculate all the dates where the shift occurs (recurring)
+      const recurringDates = this.calculateRecurringDates(
+        startDate,
+        endDate,
+        shift.dayOfWeek,
+      );
+
+      // Validate room availability for each date
+      for (const date of recurringDates) {
+        const roomAvailable = await this.isRoomAvailable(
+          shift.roomId,
+          shift.startTime,
+          shift.endTime,
+          date, // Pass the specific recurring date
+        );
+        if (!roomAvailable) {
+          throw new BadRequestException(
+            `Room ${shift.roomId} is already occupied during ${shift.startTime} - ${shift.endTime} on ${shift.dayOfWeek} (${date})`,
+          );
+        }
+      }
+    }
+  }
 
   async create(createScheduleDto: CreateScheduleDto) {
     const { doctorId, startDate, recurringEndDate, shifts } = createScheduleDto;
+
+    console.log(createScheduleDto);
 
     const start = moment(startDate); // Parse the start date
     const end = moment(recurringEndDate); // Parse the end date
 
     const schedules: any = [];
+
+    // Validate room availability before creating the schedule
+    await this.validateRoomAvailability(shifts, startDate, recurringEndDate);
 
     for (let date = start; date.isSameOrBefore(end); date.add(1, 'days')) {
       const dayOfWeek = date.day();
@@ -32,17 +117,21 @@ export class ScheduleService {
         if (shift.dayOfWeek !== DayOfWeeks[dayOfWeek]) continue;
 
         const doctor = await this.doctorRespository.findOne(+doctorId);
+        if (!doctor) throw new NotFoundException('Doctor not found!');
 
-        const schedule = this.scheduleRespository.create({
-          // @ts-ignore
+        const room = await this.roomRespository.findOne(+shift.roomId);
+        if (!room) throw new NotFoundException('Room not found!');
+
+        const schedule = this.scheduleRepository.create({
           doctor: doctor,
           date: date.toISOString(),
           startTime: shift.startTime,
           endTime: shift.endTime,
-          maxBookings: shift.bookingLimit,
+          room: room,
+          // maxBookings: shift.bookingLimit,
         });
 
-        schedules.push(await this.scheduleRespository.save(schedule));
+        schedules.push(await this.scheduleRepository.save(schedule));
       }
     }
 
@@ -50,7 +139,7 @@ export class ScheduleService {
   }
 
   async findAll() {
-    return await this.scheduleRespository.find({
+    return await this.scheduleRepository.find({
       relations: {
         doctor: true,
       },
@@ -58,7 +147,7 @@ export class ScheduleService {
   }
 
   async findByDoctorId(doctorId: number) {
-    return await this.scheduleRespository.findBy({
+    return await this.scheduleRepository.findBy({
       doctor: {
         doctorId: doctorId,
       },
@@ -73,7 +162,7 @@ export class ScheduleService {
 
     for (const day of weekDates) {
       // Fetch all schedules for this doctor within the week range (you can optimize by narrowing it down to the week range if needed)
-      const schedules = await this.scheduleRespository.find({
+      const schedules = await this.scheduleRepository.find({
         where: {
           doctor: {
             doctorId: doctorId,
@@ -85,8 +174,6 @@ export class ScheduleService {
       const schedulesForDay = schedules.filter((schedule) =>
         moment(schedule.date).isSame(day, 'day'),
       );
-
-      console.log('here', day);
 
       response.push({
         date: day,
@@ -102,7 +189,7 @@ export class ScheduleService {
   }
 
   async findOne(id: number) {
-    return await this.scheduleRespository.findOne({
+    return await this.scheduleRepository.findOne({
       where: {
         id: id,
       },

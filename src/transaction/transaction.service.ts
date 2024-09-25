@@ -1,11 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PatientsService } from 'src/patients/patients.service';
+import { Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction, TransactionStatus } from './entities/transaction.entity';
-import { PatientsService } from 'src/patients/patients.service';
-import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class TransactionService {
@@ -16,7 +15,7 @@ export class TransactionService {
   ) {}
 
   async create(patinetId: number, createTransactionDto: CreateTransactionDto) {
-    const { amount, referenceId, type } = createTransactionDto;
+    const { amount, referenceId, type, status } = createTransactionDto;
     const patient = await this.patientService.findOne(patinetId);
     if (!patient) throw new NotFoundException('No patient found!');
 
@@ -24,25 +23,59 @@ export class TransactionService {
       amount: amount,
       referenceId,
       type,
-      status: TransactionStatus.SUCCESS,
+      status: status ?? TransactionStatus.SUCCESS,
+      patient,
     });
 
     return await this.transactionRepository.save(transaction);
+  }
+
+  async payPendingTransaction(transactionId: number) {
+    const transaction = await this.transactionRepository.findOne({
+      where: {
+        id: transactionId,
+      },
+    });
+
+    if (!transaction) throw new NotFoundException('No transaction found!');
+
+    transaction.status = TransactionStatus.SUCCESS;
+    return this.transactionRepository.save(transaction);
   }
 
   findAll() {
     return `This action returns all transaction`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  async findOne(id: number) {
+    return await this.transactionRepository.findOneBy({
+      id,
+    });
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
+  async update(id: number, updateTransactionDto: UpdateTransactionDto) {
+    const transaction = await this.findOne(id);
+
+    if (!transaction) {
+      throw new NotFoundException();
+    }
+
+    Object.assign(transaction, updateTransactionDto);
+
+    return await this.transactionRepository.save(transaction);
   }
 
   remove(id: number) {
     return `This action removes a #${id} transaction`;
+  }
+
+  async getInpatientTransaction(inpatientId: number) {
+    const inpatients = await this.transactionRepository.find({
+      where: {
+        referenceId: inpatientId,
+      },
+    });
+
+    return inpatients;
   }
 }

@@ -18,7 +18,10 @@ import { InpatientStatus } from 'src/constants';
 import { RoomService } from 'src/room/room.service';
 import { RoomStatus } from 'src/room/entities/room.entity';
 import { TransactionService } from 'src/transaction/transaction.service';
-import { TransactionType } from 'src/transaction/entities/transaction.entity';
+import {
+  TransactionStatus,
+  TransactionType,
+} from 'src/transaction/entities/transaction.entity';
 import { DepositStatus } from 'src/deposit/entities/deposit.entity';
 import { InpatientChargeService } from 'src/inpatient-charge/inpatient-charge.service';
 
@@ -31,8 +34,6 @@ export class InpatientService {
     private readonly roomTypeService: RoomTypeService,
     private readonly roomService: RoomService,
     private readonly transactionService: TransactionService,
-    @Inject(forwardRef(() => DepositService))
-    private readonly depositService: DepositService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -73,55 +74,22 @@ export class InpatientService {
     await this.inpatientRepository.save(inpatient);
   }
 
-  @UseGuards(JwtAuthGuard)
-  async confirmRoom(inpatientId: number) {
-    const inpatient = await this.findOne(inpatientId);
-    if (!inpatient) throw new NotFoundException('Inpatient not found!');
+  // @UseGuards(JwtAuthGuard)
+  // async confirmRoom(inpatientId: number) {
+  //   const inpatient = await this.findOne(inpatientId);
+  //   if (!inpatient) throw new NotFoundException('Inpatient not found!');
 
-    const deposit = inpatient.deposits?.[0];
-    if (!deposit) throw new NotFoundException('deposit not found!');
+  //   const deposit = inpatient.deposits?.[0];
+  //   if (!deposit) throw new NotFoundException('deposit not found!');
 
-    const transaction = await this.transactionService.create(
-      inpatient.patient.id,
-      {
-        amount: deposit.amount,
-        referenceId: deposit.id,
-        type: TransactionType.DEPOSIT,
-      },
-    );
-
-    // TODO: Change deposit status to Success
-    this.depositService.update(deposit.id, {
-      transactionId: transaction.id,
-      status: DepositStatus.SUCCESS,
-    });
-
-    inpatient.status = InpatientStatus.ADMITTED;
-    await this.inpatientRepository.save(inpatient);
-  }
+  //   inpatient.status = InpatientStatus.ADMITTED;
+  //   await this.inpatientRepository.save(inpatient);
+  // }
 
   @UseGuards(JwtAuthGuard)
   async payRoomDeposit(inpatientId: number) {
     const inpatient = await this.findOne(inpatientId);
     if (!inpatient) throw new NotFoundException('Inpatient not found!');
-
-    const deposit = inpatient.deposits?.[0];
-    if (!deposit) throw new NotFoundException('deposit not found!');
-
-    const transaction = await this.transactionService.create(
-      inpatient.patient.id,
-      {
-        amount: deposit.amount,
-        referenceId: deposit.id,
-        type: TransactionType.DEPOSIT,
-      },
-    );
-
-    // TODO: Change deposit status to Success
-    this.depositService.update(deposit.id, {
-      transactionId: transaction.id,
-      status: DepositStatus.SUCCESS,
-    });
 
     inpatient.status = InpatientStatus.ADMITTED;
     await this.inpatientRepository.save(inpatient);
@@ -134,7 +102,7 @@ export class InpatientService {
   }
 
   async findOne(id: number) {
-    return this.inpatientRepository.findOne({
+    const inpatient = await this.inpatientRepository.findOne({
       where: {
         id,
       },
@@ -147,6 +115,19 @@ export class InpatientService {
         'charges',
       ],
     });
+
+    if (!inpatient) {
+      throw new Error('Inpatient not found');
+    }
+
+    const transactions =
+      await this.transactionService.getInpatientTransaction(id);
+
+    console.log(inpatient, transactions);
+    return {
+      ...inpatient,
+      transactions, // Add the transactions to the result
+    };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -163,9 +144,11 @@ export class InpatientService {
     inpatient.room = room;
     inpatient.status = InpatientStatus.PENDING_DEPOSIT;
 
-    await this.depositService.create({
+    await this.transactionService.create(inpatient.patient.id, {
       amount: depositAmount,
-      inpatientId: inpatientId,
+      referenceId: inpatient.id,
+      status: TransactionStatus.PENDING,
+      type: TransactionType.ROOM_DEPOSIT,
     });
 
     return this.inpatientRepository.save(inpatient);

@@ -1,6 +1,7 @@
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { DayOfWeek } from 'src/constants';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
+import { Room } from 'src/room/entities/room.entity';
 import {
   Column,
   CreateDateColumn,
@@ -28,8 +29,11 @@ export class Schedule {
   @Column({ type: 'time' })
   endTime: string;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', default: 0 })
   maxBookings: number;
+
+  @ManyToOne(() => Room, (room) => room.schedules)
+  room: Room;
 
   @OneToMany(() => Appointment, (appointment) => appointment.schedule)
   appointments: Appointment[];
