@@ -9,8 +9,6 @@ import { AppointmentStatus } from 'src/constants';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SlotService } from 'src/slot/slot.service';
 import { Slot, SlotStatus } from 'src/slot/entities/slot.entity';
-import { Doctor } from 'src/doctor/entities/doctor.entity';
-import { Patient } from 'src/patients/entities/patient.entity';
 
 @Injectable()
 export class AppointmentService {
@@ -86,7 +84,7 @@ export class AppointmentService {
 
       // Set start and end of the specific date (midnight to 11:59:59)
       const startOfDay = new Date(specificDate.setHours(0, 0, 0, 0)); // Midnight
-      const endOfDay = new Date(specificDate.setHours(24, 0, 0, 0)); // 23:59:59
+      const endOfDay = new Date(specificDate.setHours(23, 59, 59, 59)); // 23:59:59
 
       query.andWhere('schedule.date BETWEEN :startOfDay AND :endOfDay', {
         startOfDay,
