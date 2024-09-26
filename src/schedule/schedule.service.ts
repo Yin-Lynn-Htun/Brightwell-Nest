@@ -242,7 +242,7 @@ export class ScheduleService {
       where: {
         id: id,
       },
-      relations: ['appointments', 'doctor.user', 'appointments.patient'],
+      relations: ['slots', 'doctor.user', 'slots.appointment.patient'],
     });
   }
 

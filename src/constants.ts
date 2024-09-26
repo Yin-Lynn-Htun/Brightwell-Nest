@@ -13,7 +13,6 @@ export enum DayOfWeek {
 export enum AppointmentStatus {
   BOOKED = 'Booked',
   CANCELED = 'Canceled',
-  WAITLISTED = 'Waitlisted',
 }
 
 export enum PurchaseStatus {

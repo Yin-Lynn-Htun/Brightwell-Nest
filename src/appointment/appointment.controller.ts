@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -33,8 +34,17 @@ export class AppointmentController {
   }
 
   @Get()
-  findAll() {
-    return this.appointmentService.findAll();
+  async getAppointments(
+    @Query('date') date?: string,
+    @Query('doctorId') doctorIds?: string[],
+  ) {
+    const doctorIdArray =
+      typeof doctorIds === 'string'
+        ? [doctorIds]
+        : doctorIds
+          ? doctorIds.map((id) => parseInt(id, 10))
+          : undefined;
+    return this.appointmentService.getAppointments(date, doctorIdArray);
   }
 
   @Get(':id')

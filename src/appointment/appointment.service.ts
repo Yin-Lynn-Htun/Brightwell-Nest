@@ -8,7 +8,9 @@ import { ScheduleService } from 'src/schedule/schedule.service';
 import { AppointmentStatus } from 'src/constants';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SlotService } from 'src/slot/slot.service';
-import { SlotStatus } from 'src/slot/entities/slot.entity';
+import { Slot, SlotStatus } from 'src/slot/entities/slot.entity';
+import { Doctor } from 'src/doctor/entities/doctor.entity';
+import { Patient } from 'src/patients/entities/patient.entity';
 
 @Injectable()
 export class AppointmentService {
@@ -44,8 +46,8 @@ export class AppointmentService {
     return { ...data, responseMessage: 'Appointment created successfully!' };
   }
 
-  findAll() {
-    return this.appointmentRepository.find({
+  async findAll() {
+    return await this.appointmentRepository.find({
       relations: {
         patient: true,
       },
@@ -62,5 +64,78 @@ export class AppointmentService {
 
   remove(id: number) {
     return `This action removes a #${id} appointment`;
+  }
+
+  async getAppointments(date?: string, doctorIds?: number[]) {
+    const query = this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .innerJoinAndSelect('appointment.slot', 'slot') // Join slot relation
+      .innerJoinAndSelect('slot.schedule', 'schedule') // Join schedule relation
+      .innerJoinAndSelect('schedule.doctor', 'doctor') // Join doctor relation
+      .innerJoinAndSelect('doctor.user', 'user') // Join doctor relation
+      .innerJoinAndSelect('appointment.patient', 'patient'); // Join patient relation
+
+    // Apply doctor filter if doctorIds are provided
+    if (doctorIds && doctorIds.length > 0) {
+      query.andWhere('doctor.doctorId IN (:...doctorIds)', { doctorIds });
+    }
+
+    // Apply date filter if provided, otherwise fetch both history and upcoming
+    if (date) {
+      const specificDate = new Date(date);
+
+      // Set start and end of the specific date (midnight to 11:59:59)
+      const startOfDay = new Date(specificDate.setHours(0, 0, 0, 0)); // Midnight
+      const endOfDay = new Date(specificDate.setHours(24, 0, 0, 0)); // 23:59:59
+
+      console.log(startOfDay, endOfDay, specificDate);
+      query.andWhere('schedule.date BETWEEN :startOfDay AND :endOfDay', {
+        startOfDay,
+        endOfDay,
+      });
+    } else {
+      // If no date provided, fetch both past (history) and upcoming appointments
+      query.orderBy('schedule.date', 'ASC');
+    }
+
+    const appointments = await query.getMany();
+
+    return appointments.map((appointment) => ({
+      slot: appointment.slot,
+      doctor: {
+        ...appointment.slot.schedule.doctor,
+        ...appointment.slot.schedule.doctor.user,
+      }, // Make sure doctor is loaded
+      patient: appointment.patient,
+    }));
+  }
+
+  private groupAppointmentsByDate(appointments: Appointment[]) {
+    return appointments.reduce((grouped: GroupedAppointment[], appointment) => {
+      const appointmentDate = new Date(appointment.slot.schedule.date)
+        .toISOString()
+        .split('T')[0]; // Extract the date part
+
+      // Find if the date already exists in the result
+      let dateGroup = grouped.find((group) => group.date === appointmentDate);
+
+      // If the date group doesn't exist, create a new one
+      if (!dateGroup) {
+        dateGroup = {
+          date: appointmentDate,
+          appointments: [],
+        };
+        grouped.push(dateGroup);
+      }
+
+      // Add the appointment data to the date's appointments array
+      dateGroup.appointments.push({
+        slot: appointment.slot,
+        doctor: appointment.slot.schedule.doctor, // Make sure doctor is loaded
+        patient: appointment.patient,
+      });
+
+      return grouped;
+    }, [] as GroupedAppointment[]);
   }
 }
