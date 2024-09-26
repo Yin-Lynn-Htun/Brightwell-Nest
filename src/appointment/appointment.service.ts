@@ -88,7 +88,6 @@ export class AppointmentService {
       const startOfDay = new Date(specificDate.setHours(0, 0, 0, 0)); // Midnight
       const endOfDay = new Date(specificDate.setHours(24, 0, 0, 0)); // 23:59:59
 
-      console.log(startOfDay, endOfDay, specificDate);
       query.andWhere('schedule.date BETWEEN :startOfDay AND :endOfDay', {
         startOfDay,
         endOfDay,

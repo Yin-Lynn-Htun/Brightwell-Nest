@@ -123,7 +123,6 @@ export class InpatientService {
     const transactions =
       await this.transactionService.getInpatientTransaction(id);
 
-    console.log(inpatient, transactions);
     return {
       ...inpatient,
       transactions, // Add the transactions to the result

@@ -31,7 +31,6 @@ export class SlotService {
     if (!slot) throw new NotFoundException('Slot not found!');
 
     Object.assign(slot, updateSlotDto);
-    console.log('here');
     return await this.slotRepository.save(slot);
   }
 
