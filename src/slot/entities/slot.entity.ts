@@ -36,7 +36,7 @@ export class Slot {
   @ManyToOne(() => Schedule, (schedule) => schedule.slots)
   schedule: Schedule;
 
-  @OneToOne(() => Appointment)
+  @OneToOne(() => Appointment, (appointment) => appointment.slot)
   @JoinColumn()
   appointment: Appointment; // Single appointment for each slot
 }

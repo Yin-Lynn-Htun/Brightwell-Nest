@@ -23,8 +23,7 @@ export class Appointment {
   @ManyToOne(() => Patient, (patient) => patient.appointments)
   patient: Patient;
 
-  @OneToOne(() => Slot)
-  @JoinColumn()
+  @OneToOne(() => Slot, (slot) => slot.appointment)
   slot: Slot; // Optional relation
 
   @Column({ type: 'enum', enum: AppointmentStatus })

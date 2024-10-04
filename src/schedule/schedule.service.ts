@@ -9,7 +9,7 @@ import { Between, Repository } from 'typeorm';
 import { Schedule } from './entities/schedule.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { DayOfWeeks } from 'src/constants';
+import { AppointmentStatus, DayOfWeeks } from 'src/constants';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { getWeekDates } from 'src/utils';
 import { RoomService } from 'src/room/room.service';
@@ -238,12 +238,17 @@ export class ScheduleService {
   }
 
   async findOne(id: number) {
-    return await this.scheduleRepository.findOne({
-      where: {
-        id: id,
-      },
-      relations: ['slots', 'doctor.user', 'slots.appointment.patient'],
-    });
+    return await this.scheduleRepository
+      .createQueryBuilder('schedule')
+      .leftJoinAndSelect('schedule.doctor', 'doctor')
+      .leftJoinAndSelect('doctor.user', 'user')
+      .leftJoinAndSelect('schedule.slots', 'slot', 'slot.status = :status', {
+        status: SlotStatus.Booked,
+      })
+      .leftJoinAndSelect('slot.appointment', 'appointment')
+      .leftJoinAndSelect('appointment.patient', 'patient')
+      .where('schedule.id = :id', { id })
+      .getOne();
   }
 
   update(id: number, updateScheduleDto: UpdateScheduleDto) {

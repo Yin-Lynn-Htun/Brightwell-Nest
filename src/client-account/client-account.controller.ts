@@ -1,17 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { ClientAccountService } from './client-account.service';
-import { CreateClientAccountDto } from './dto/create-client-account.dto';
-import { UpdateClientAccountDto } from './dto/update-client-account.dto';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 import { Request } from 'express';
 import { PatientsService } from 'src/patients/patients.service';
