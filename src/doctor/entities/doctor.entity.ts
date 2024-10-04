@@ -1,5 +1,6 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
 import { DoctorEdu } from 'src/doctor-edu/entities/doctor-edu.entity';
+import { MedicalHistory } from 'src/medical-history/entities/medical-history.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Speciality } from 'src/specialities/entities/speciality.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -46,4 +47,7 @@ export class Doctor {
 
   @Column({ type: 'varchar', length: 50 })
   idNumber: string;
+
+  @OneToMany(() => MedicalHistory, (medicalHistory) => medicalHistory.createdBy)
+  medicalHistories: MedicalHistory[];
 }

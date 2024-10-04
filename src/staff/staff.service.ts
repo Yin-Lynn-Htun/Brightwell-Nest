@@ -4,7 +4,7 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Staff } from './entities/staff.entity';
 import { Repository } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { Role, User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -18,6 +18,7 @@ export class StaffService {
   async create(createStaffDto: CreateStaffDto) {
     const user = await this.userRespository.create({
       ...createStaffDto,
+      role: Role.Staff,
     });
 
     const staff = this.staffRespository.create({

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,7 @@ import { DoctorEduService } from 'src/doctor-edu/doctor-edu.service';
 import { CreateDoctorEduDto } from 'src/doctor-edu/dto/create-doctor-edu.dto';
 import { SpecialitiesService } from 'src/specialities/specialities.service';
 import { Speciality } from 'src/specialities/entities/speciality.entity';
+import { Role } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class DoctorService {
@@ -37,6 +38,7 @@ export class DoctorService {
 
     const user = await this.userRespository.create({
       ...createDoctorDto,
+      role: Role.Doctor,
     });
 
     const doc = this.doctorRespository.create({
@@ -81,6 +83,22 @@ export class DoctorService {
         educations: true,
       },
     });
+
+    return doctor;
+  }
+
+  // Method to find doctor by userId
+  async findByUserId(userId: number): Promise<Doctor> {
+    const doctor = await this.doctorRespository.findOne({
+      where: {
+        user: { userId: userId }, // Query by userId
+      },
+      relations: ['user'],
+    });
+
+    if (!doctor) {
+      throw new NotFoundException(`Doctor with user ID ${userId} not found`);
+    }
 
     return doctor;
   }

@@ -4,8 +4,9 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UnauthorizedException } from '@nestjs/common';
+import { JwtPayload } from './types/auth';
 
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -19,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: JwtPayload): Promise<User> {
     const { email } = payload;
     const user: User | null = await this.userRepository.findOne({
-      select: ['userId', 'password'],
+      select: ['userId', 'email', 'phoneNumber', 'role'],
       where: { email },
     });
 

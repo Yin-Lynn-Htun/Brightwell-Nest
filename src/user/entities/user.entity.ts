@@ -8,12 +8,17 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
-import { Role } from 'src/role/entities/role.entity';
 
 export enum Gender {
   Male = 'Male',
   Female = 'Female',
   Other = 'Other',
+}
+
+export enum Role {
+  Doctor = 'Doctor',
+  Admin = 'Admin',
+  Staff = 'Staff',
 }
 
 export enum Relationship {
@@ -48,7 +53,12 @@ export class User {
   @Column({ type: 'text' })
   password: string;
 
-  @ManyToOne(() => Role, (role) => role.users)
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.Admin,
+  })
+  @IsEnum(Role)
   role: Role;
 
   // contact info

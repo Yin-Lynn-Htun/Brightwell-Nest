@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { DoctorService } from './doctor.service';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
@@ -30,5 +39,15 @@ export class DoctorController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.doctorService.remove(+id);
+  }
+
+  // Endpoint to find a doctor by userId
+  @Get('/user/:userId')
+  async findByUserId(@Param('userId') userId: number) {
+    const doctor = await this.doctorService.findByUserId(userId);
+    if (!doctor) {
+      throw new NotFoundException(`Doctor with user ID ${userId} not found`);
+    }
+    return doctor;
   }
 }

@@ -12,6 +12,7 @@ import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Purchase } from 'src/purchase/entities/purchase.entity';
 import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { MedicalHistory } from 'src/medical-history/entities/medical-history.entity';
 
 export enum Gender {
   Male = 'Male',
@@ -116,4 +117,7 @@ export class Patient {
 
   @OneToMany(() => Transaction, (transaction) => transaction.patient)
   transactions: Transaction[];
+
+  @OneToMany(() => MedicalHistory, (medicalHistory) => medicalHistory.patient)
+  medicalHistories: MedicalHistory[];
 }

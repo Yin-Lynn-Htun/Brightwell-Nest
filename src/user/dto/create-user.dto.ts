@@ -8,7 +8,7 @@ import {
   Length,
   IsDateString,
 } from 'class-validator';
-import { Gender } from '../entities/user.entity';
+import { Gender, Role } from '../entities/user.entity';
 import { Relationship } from '../entities/user.entity';
 
 export class CreateUserDto {
@@ -37,8 +37,8 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  @IsNotEmpty()
-  roleId: number; // Assuming role is stored by its ID
+  @IsEnum(Role)
+  role: Role; // Assuming role is stored by its ID
 
   // Contact info
   @IsEnum(Gender)

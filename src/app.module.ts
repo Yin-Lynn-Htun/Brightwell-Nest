@@ -11,7 +11,7 @@ import { join } from 'path';
 import { CitiesModule } from './cities/cities.module';
 import { SpecialitiesModule } from './specialities/specialities.module';
 import { StaffModule } from './staff/staff.module';
-import { RoleModule } from './role/role.module';
+
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { DoctorModule } from './doctor/doctor.module';
@@ -36,6 +36,7 @@ import { TransactionModule } from './transaction/transaction.module';
 import { InpatientChargeModule } from './inpatient-charge/inpatient-charge.module';
 import { DepositModule } from './deposit/deposit.module';
 import { SlotModule } from './slot/slot.module';
+import { MedicalHistoryModule } from './medical-history/medical-history.module';
 
 @Module({
   controllers: [AppController, CatsController],
@@ -67,7 +68,6 @@ import { SlotModule } from './slot/slot.module';
     PatientsModule,
     SpecialitiesModule,
     StaffModule,
-    RoleModule,
     AuthModule,
     UserModule,
     DoctorModule,
@@ -90,6 +90,7 @@ import { SlotModule } from './slot/slot.module';
     InpatientChargeModule,
     DepositModule,
     SlotModule,
+    MedicalHistoryModule,
   ],
 })
 export class AppModule {}

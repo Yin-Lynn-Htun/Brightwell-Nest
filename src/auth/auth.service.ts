@@ -6,10 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { User } from './../user/entities/user.entity';
+import { Role, User } from './../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './types/auth';
 
 @Injectable()
 export class AuthService {
@@ -40,10 +41,11 @@ export class AuthService {
       // JWT TOKEN FOR SECURE
       const payload: JwtPayload = {
         email,
+        id: user.userId,
         firstName: user.firstName,
         lastName: user.lastName,
         phoneNumber: user.phoneNumber,
-        role: 'Admin',
+        role: user.role,
       };
       console.log(payload);
       const accessToken = this.jwtService.sign(payload);

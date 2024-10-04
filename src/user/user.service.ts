@@ -11,27 +11,27 @@ import { saltOrRounds } from 'src/constants';
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly staffRespository: Repository<User>,
+    private readonly userRespository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     const password = createUserDto.password || 'test123!';
     const hash = await bcrypt.hash(password, saltOrRounds);
 
-    const staff = this.staffRespository.create({
+    const staff = this.userRespository.create({
       ...createUserDto,
       password: hash,
     });
 
-    return await this.staffRespository.save(staff);
+    return await this.userRespository.save(staff);
   }
 
   async findAll() {
-    return await this.staffRespository.find();
+    return await this.userRespository.find();
   }
 
   async findOne(id: number) {
-    return await this.staffRespository.findOne({
+    return await this.userRespository.findOne({
       where: { userId: id },
     });
   }
@@ -45,7 +45,7 @@ export class UserService {
 
     Object.assign(city, updateStaffDto);
 
-    return await this.staffRespository.save(city);
+    return await this.userRespository.save(city);
   }
 
   async remove(id: number) {
@@ -55,6 +55,6 @@ export class UserService {
       throw new NotFoundException();
     }
 
-    return await this.staffRespository.remove(city);
+    return await this.userRespository.remove(city);
   }
 }
