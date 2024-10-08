@@ -16,6 +16,12 @@ export enum TransactionType {
   ROOM_DEPOSIT = 'RoomDeposit',
 }
 
+export enum TransactionChannel {
+  credit_card = 'credit_card',
+  mobile_banking = 'mobile_banking',
+  qr_payment = 'qr_payment',
+}
+
 @Entity('transaction')
 export class Transaction {
   @PrimaryGeneratedColumn()
@@ -39,6 +45,13 @@ export class Transaction {
     enum: TransactionType,
   })
   type: TransactionType;
+
+  @Column({
+    type: 'enum',
+    nullable: true,
+    enum: TransactionChannel,
+  })
+  channel: TransactionChannel;
 
   // This will be the ID of the related entity (Package, Appointment, or Room Booking)
   @Column({

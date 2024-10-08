@@ -31,6 +31,7 @@ export class UserService {
   }
 
   async findOne(id: number) {
+    console.log(id, 'here');
     return await this.userRespository.findOne({
       where: { userId: id },
     });

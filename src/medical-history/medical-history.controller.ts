@@ -47,6 +47,11 @@ export class MedicalHistoryController {
     );
   }
 
+  @Get('/patient/:patientId')
+  async findAllByPatient(@Param('patientId') patientId: number) {
+    return this.medicalHistoryService.findAllByPatient(patientId);
+  }
+
   @Get()
   findAll() {
     return this.medicalHistoryService.findAll();

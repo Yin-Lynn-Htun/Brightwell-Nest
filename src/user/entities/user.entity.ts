@@ -42,6 +42,9 @@ export class User {
   @IsNotEmpty()
   lastName: string;
 
+  @Column({ type: 'varchar', length: 254, nullable: true })
+  imageUrl: string;
+
   @Column({ type: 'varchar', length: 254 })
   @IsEmail()
   email: string;

@@ -30,7 +30,18 @@ export class MedicalHistoryService {
 
   async findAll(): Promise<MedicalHistory[]> {
     return await this.medicalHistoryRepository.find({
-      relations: ['patient', 'createdBy', 'files'],
+      relations: ['patient', 'createdBy'],
+    });
+  }
+
+  async findAllByPatient(patientId: number): Promise<MedicalHistory[]> {
+    return await this.medicalHistoryRepository.find({
+      where: {
+        patient: {
+          id: patientId,
+        },
+      },
+      relations: ['patient', 'createdBy', 'createdBy.user'],
     });
   }
 

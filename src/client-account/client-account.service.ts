@@ -6,13 +6,16 @@ import { Patient } from 'src/patients/entities/patient.entity';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
 import { AppointmentStatus } from 'src/constants';
-import { Deposit, DepositStatus } from 'src/deposit/entities/deposit.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { TransactionService } from 'src/transaction/transaction.service';
 
 @Injectable()
 export class ClientAccountService {
   constructor(
     @InjectRepository(Patient)
     private readonly patientsRespository: Repository<Patient>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
   ) {}
 
   async getAppointment(id: number) {
@@ -107,32 +110,18 @@ export class ClientAccountService {
     return data?.inpatients ?? [];
   }
 
-  async getPendingTransactions(patientId: number) {
-    const data = await this.patientsRespository.findOne({
+  async getTransactions(patientId: number) {
+    const data = await this.transactionRepository.find({
       where: {
-        id: patientId,
+        patient: {
+          id: patientId,
+        },
       },
-      relations: ['transactions'],
+      order: {
+        id: 'DESC',
+      },
     });
 
-    return data?.transactions ?? [];
-  }
-
-  async getPendingDeposits(patientId: number) {
-    return this.patientsRespository
-      .createQueryBuilder('patient') // Use createQueryBuilder on patientRepository
-      .leftJoinAndSelect('patient.inpatients', 'inpatient')
-      .leftJoinAndSelect('inpatient.deposits', 'deposit')
-      .where('patient.id = :patientId', { patientId })
-      .andWhere('deposit.status = :status', { status: DepositStatus.PENDING })
-      .select([
-        'patient.id as patient_id',
-        'inpatient.id as inpatient_id',
-        'deposit.id as deposit_id',
-        'deposit.amount as amount',
-        'deposit.createdAt as created_at',
-        'deposit.status as status',
-      ])
-      .getRawMany();
+    return data ?? [];
   }
 }

@@ -41,6 +41,9 @@ export class MedicalHistory {
   @ManyToOne(() => Patient, (patient) => patient.medicalHistories)
   patient: Patient;
 
+  @Column('text', { array: true, nullable: true }) // This defines an array of strings
+  attachments: string[];
+
   @ManyToOne(() => Doctor, (doctor) => doctor.medicalHistories)
   createdBy: Doctor;
 

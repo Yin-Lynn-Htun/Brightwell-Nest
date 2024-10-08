@@ -1,4 +1,5 @@
 import {
+  TransactionChannel,
   TransactionStatus,
   TransactionType,
 } from '../entities/transaction.entity';
@@ -6,6 +7,7 @@ import {
 export class CreateTransactionDto {
   amount: number;
   type: TransactionType;
+  channel?: TransactionChannel;
   referenceId?: number;
   status?: TransactionStatus;
 }

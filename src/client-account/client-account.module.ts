@@ -4,9 +4,11 @@ import { ClientAccountController } from './client-account.controller';
 import { PatientsModule } from 'src/patients/patients.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Patient } from 'src/patients/entities/patient.entity';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { TransactionModule } from 'src/transaction/transaction.module';
 
 @Module({
-  imports: [PatientsModule, TypeOrmModule.forFeature([Patient])],
+  imports: [PatientsModule, TypeOrmModule.forFeature([Patient, Transaction])],
   controllers: [ClientAccountController],
   providers: [ClientAccountService],
 })

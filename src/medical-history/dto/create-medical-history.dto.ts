@@ -8,4 +8,6 @@ export class CreateMedicalHistoryDto {
   @IsString()
   @IsNotEmpty()
   description: string;
+
+  attachments: string[];
 }
