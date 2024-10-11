@@ -47,6 +47,11 @@ export class AppointmentController {
     return this.appointmentService.getAppointments(date, doctorIdArray);
   }
 
+  @Get('/recent')
+  async getRecentAppointments() {
+    return this.appointmentService.getRecentAppointments();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.appointmentService.findOne(+id);

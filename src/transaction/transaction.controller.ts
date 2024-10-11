@@ -8,11 +8,11 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 
 @Controller('transaction')
 export class TransactionController {
@@ -24,8 +24,8 @@ export class TransactionController {
   }
 
   @Get()
-  findAll() {
-    return this.transactionService.findAll();
+  findAll(@Query('limit') limit?: number) {
+    return this.transactionService.findAll(limit);
   }
 
   @Get(':id')

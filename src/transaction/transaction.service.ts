@@ -45,15 +45,18 @@ export class TransactionService {
     return this.transactionRepository.save(transaction);
   }
 
-  async findAll() {
-    return await this.transactionRepository.find({
-      relations: {
-        patient: true,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+  async findAll(limit?: number) {
+    console.log(limit, 'limit');
+    const queryBuilder = this.transactionRepository
+      .createQueryBuilder('transaction')
+      .leftJoinAndSelect('transaction.patient', 'patient')
+      .orderBy('transaction.createdAt', 'DESC');
+
+    if (limit) {
+      queryBuilder.take(limit);
+    }
+
+    return await queryBuilder.getMany();
   }
 
   async findOne(id: number) {

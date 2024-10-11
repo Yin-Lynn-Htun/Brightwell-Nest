@@ -107,6 +107,18 @@ export class AppointmentService {
     }));
   }
 
+  async getRecentAppointments() {
+    return this.appointmentRepository.find({
+      relations: {
+        patient: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 5,
+    });
+  }
+
   private groupAppointmentsByDate(appointments: Appointment[]) {
     return appointments.reduce((grouped: GroupedAppointment[], appointment) => {
       const appointmentDate = new Date(appointment.slot.schedule.date)
