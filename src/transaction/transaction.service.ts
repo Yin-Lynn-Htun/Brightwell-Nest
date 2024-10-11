@@ -14,9 +14,10 @@ export class TransactionService {
     private readonly patientService: PatientsService,
   ) {}
 
-  async create(patinetId: number, createTransactionDto: CreateTransactionDto) {
-    const { amount, referenceId, type, status, channel } = createTransactionDto;
-    const patient = await this.patientService.findOne(patinetId);
+  async create(createTransactionDto: CreateTransactionDto) {
+    const { amount, referenceId, type, status, channel, patientId } =
+      createTransactionDto;
+    const patient = await this.patientService.findOne(patientId);
     if (!patient) throw new NotFoundException('No patient found!');
 
     const transaction = this.transactionRepository.create({
@@ -56,8 +57,13 @@ export class TransactionService {
   }
 
   async findOne(id: number) {
-    return await this.transactionRepository.findOneBy({
-      id,
+    return await this.transactionRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        patient: true,
+      },
     });
   }
 

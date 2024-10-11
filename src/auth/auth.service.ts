@@ -33,6 +33,7 @@ export class AuthService {
         'lastName',
         'phoneNumber',
         'password',
+        'role',
       ],
     });
 
@@ -47,7 +48,7 @@ export class AuthService {
         phoneNumber: user.phoneNumber,
         role: user.role,
       };
-      console.log(payload);
+      console.log(payload, 'here payload');
       const accessToken = this.jwtService.sign(payload);
       return { accessToken };
     } else {

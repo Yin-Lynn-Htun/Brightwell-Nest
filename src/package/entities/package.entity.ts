@@ -22,11 +22,10 @@ export class Package {
   @Column('text')
   description: string;
 
-  @Column({ type: 'date' })
-  startDate: string;
-
-  @Column({ type: 'date' })
-  expireDate: string;
+  @Column('text', {
+    default: '',
+  })
+  imageUrl: string;
 
   @Column('decimal')
   price: number;

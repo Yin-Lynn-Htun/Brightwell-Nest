@@ -7,6 +7,7 @@ import {
 export class CreateTransactionDto {
   amount: number;
   type: TransactionType;
+  patientId: number;
   channel?: TransactionChannel;
   referenceId?: number;
   status?: TransactionStatus;

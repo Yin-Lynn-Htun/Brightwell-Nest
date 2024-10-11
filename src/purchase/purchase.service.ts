@@ -61,8 +61,18 @@ export class PurchaseService {
     return `This action returns a #${id} purchase`;
   }
 
-  update(id: number, updatePurchaseDto: UpdatePurchaseDto) {
-    return `This action updates a #${id} purchase`;
+  async update(id: number, updatePurchaseDto: UpdatePurchaseDto) {
+    const purchase = await this.purchaseRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!purchase) throw new NotFoundException();
+
+    Object.assign(purchase, updatePurchaseDto);
+
+    return await this.purchaseRepository.save(purchase);
   }
 
   remove(id: number) {

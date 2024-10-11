@@ -28,6 +28,9 @@ export class RoomType {
   @OneToMany(() => RoomCharge, (charge) => charge.roomType)
   charges: RoomCharge[];
 
+  @Column({ type: 'varchar', array: true, default: null })
+  images: string[];
+
   @ManyToMany(() => RoomAmenity)
   @JoinTable()
   amenities: RoomAmenity[];

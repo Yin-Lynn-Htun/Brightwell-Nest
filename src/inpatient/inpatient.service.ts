@@ -74,6 +74,22 @@ export class InpatientService {
     await this.inpatientRepository.save(inpatient);
   }
 
+  async discharge(inpatientId: number) {
+    const inpatient = await this.findOne(inpatientId);
+    if (!inpatient) throw new NotFoundException('Inpatient not found!');
+    if (!inpatient.room) throw new NotFoundException('Room not found!');
+
+    inpatient.status = InpatientStatus.DISCHARGED;
+    inpatient.room.status = RoomStatus.Available;
+    inpatient.endDate = new Date();
+
+    await this.roomService.update(inpatient.room.id, {
+      status: RoomStatus.Available,
+    });
+
+    await this.inpatientRepository.save(inpatient);
+  }
+
   // @UseGuards(JwtAuthGuard)
   // async confirmRoom(inpatientId: number) {
   //   const inpatient = await this.findOne(inpatientId);
@@ -98,6 +114,9 @@ export class InpatientService {
   async findAll() {
     return this.inpatientRepository.find({
       relations: ['patient', 'roomType', 'room'],
+      order: {
+        createdAt: 'desc',
+      },
     });
   }
 
@@ -143,7 +162,8 @@ export class InpatientService {
     inpatient.room = room;
     inpatient.status = InpatientStatus.PENDING_DEPOSIT;
 
-    await this.transactionService.create(inpatient.patient.id, {
+    await this.transactionService.create({
+      patientId: inpatient.patient.id,
       amount: depositAmount,
       referenceId: inpatient.id,
       status: TransactionStatus.PENDING,

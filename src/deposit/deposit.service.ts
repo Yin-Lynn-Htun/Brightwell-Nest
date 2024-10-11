@@ -43,10 +43,11 @@ export class DepositService {
     const deposit = await this.findOne(depositId);
     if (!deposit) throw new NotFoundException('Deposit not found!');
 
-    const transaction = await this.transactionService.create(patientId, {
+    await this.transactionService.create({
       amount: deposit.amount,
       type: TransactionType.DEPOSIT,
       referenceId: deposit.id,
+      patientId: patientId,
     });
 
     deposit.status = DepositStatus.SUCCESS;

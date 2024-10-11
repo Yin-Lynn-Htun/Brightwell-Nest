@@ -14,6 +14,7 @@ import { InpatientService } from './inpatient.service';
 import { AssignRoomDto, CreateInpatientDto } from './dto/create-inpatient.dto';
 import { UpdateInpatientDto } from './dto/update-inpatient.dto';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
+import { JwtAdminGuard } from 'src/auth/jwt.guard';
 
 @Controller('inpatient')
 export class InpatientController {
@@ -57,6 +58,12 @@ export class InpatientController {
   @UseGuards(JwtAuthGuard)
   requestDeposit(@Param('id') id: string) {
     return this.inpatientService.payRoomDeposit(+id);
+  }
+
+  @Patch(':id/discharge')
+  @UseGuards(JwtAdminGuard)
+  discharge(@Param('id') id: string) {
+    return this.inpatientService.discharge(+id);
   }
 
   @Patch(':id/pay-deposit')

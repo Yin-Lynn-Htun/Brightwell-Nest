@@ -19,13 +19,8 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  create(
-    @Req() req: Request & { user: { id: string } },
-    @Body() createTransactionDto: CreateTransactionDto,
-  ) {
-    const patientId = +req.user?.id;
-    return this.transactionService.create(patientId, createTransactionDto);
+  create(@Body() createTransactionDto: CreateTransactionDto) {
+    return this.transactionService.create(createTransactionDto);
   }
 
   @Get()

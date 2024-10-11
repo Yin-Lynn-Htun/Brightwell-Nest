@@ -14,6 +14,7 @@ import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { Request } from 'express';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
+import { PurchaseStatus } from 'src/constants';
 
 @Controller('purchase')
 export class PurchaseController {
@@ -50,5 +51,12 @@ export class PurchaseController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.purchaseService.remove(+id);
+  }
+
+  @Patch(':id/use')
+  usePackage(@Param('id') id: string) {
+    return this.purchaseService.update(+id, {
+      status: PurchaseStatus.EXPIRED,
+    });
   }
 }

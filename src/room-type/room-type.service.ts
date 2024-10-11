@@ -51,6 +51,7 @@ export class RoomTypeService {
       amenities: amenityList,
       charges: chargeList,
       description: createRoomTypeDto.description,
+      images: createRoomTypeDto.images,
     });
 
     return await this.roomTypeRespository.save(roomType);

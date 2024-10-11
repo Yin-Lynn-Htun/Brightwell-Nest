@@ -3,15 +3,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { Role, User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { saltOrRounds } from 'src/constants';
+import { Doctor } from 'src/doctor/entities/doctor.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRespository: Repository<User>,
+    @InjectRepository(Doctor)
+    private readonly doctorRespository: Repository<Doctor>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -31,31 +34,26 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    console.log(id, 'here');
-    return await this.userRespository.findOne({
+    const data = await this.userRespository.findOne({
       where: { userId: id },
     });
-  }
 
-  async update(id: number, updateStaffDto: UpdateUserDto) {
-    const city = await this.findOne(id);
+    let doctorId = null;
 
-    if (!city) {
-      throw new NotFoundException();
+    if (data?.role === Role.Doctor) {
+      const doctor = await this.doctorRespository.findOne({
+        where: {
+          user: {
+            userId: data?.userId,
+          },
+        },
+      });
+
+      if (!doctor) throw new NotFoundException('Doctor not found!');
+
+      doctorId = doctor.doctorId;
     }
 
-    Object.assign(city, updateStaffDto);
-
-    return await this.userRespository.save(city);
-  }
-
-  async remove(id: number) {
-    const city = await this.findOne(id);
-
-    if (!city) {
-      throw new NotFoundException();
-    }
-
-    return await this.userRespository.remove(city);
+    return { ...data, doctorId };
   }
 }
