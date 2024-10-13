@@ -33,7 +33,9 @@ export class RoomService {
   }
 
   async findAll(roomType?: string, status?: string): Promise<Room[]> {
-    const queryBuilder = this.roomRespository.createQueryBuilder('room');
+    const queryBuilder = this.roomRespository
+      .createQueryBuilder('room')
+      .leftJoinAndSelect('room.roomType', 'roomType');
 
     // Apply roomType filter if provided
     if (roomType) {

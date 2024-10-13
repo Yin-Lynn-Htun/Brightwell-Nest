@@ -245,6 +245,7 @@ export class ScheduleService {
       .leftJoinAndSelect('schedule.slots', 'slot', 'slot.status = :status', {
         status: SlotStatus.Booked,
       })
+      .leftJoinAndSelect('schedule.room', 'room')
       .leftJoinAndSelect('slot.appointment', 'appointment')
       .leftJoinAndSelect('appointment.patient', 'patient')
       .where('schedule.id = :id', { id })

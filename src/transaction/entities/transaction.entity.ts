@@ -1,5 +1,11 @@
 import { Patient } from 'src/patients/entities/patient.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum TransactionStatus {
   PENDING = 'Pending',
@@ -14,12 +20,14 @@ export enum TransactionType {
   INPATIENT = 'Inpatient',
   DEPOSIT = 'Deposit',
   ROOM_DEPOSIT = 'RoomDeposit',
+  FOLLOW_UP_CHARGES = 'Follow_Up_Charges',
 }
 
 export enum TransactionChannel {
   credit_card = 'credit_card',
   mobile_banking = 'mobile_banking',
   qr_payment = 'qr_payment',
+  'on_site_payment' = 'on_site_payment',
 }
 
 @Entity('transaction')
@@ -59,6 +67,6 @@ export class Transaction {
   })
   referenceId: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 }

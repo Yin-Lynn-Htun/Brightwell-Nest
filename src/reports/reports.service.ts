@@ -298,19 +298,74 @@ export class ReportsService {
     return ((current - previous) / previous) * 100;
   }
 
-  findAll() {
-    return `This action returns all reports`;
+  async getPackagePurchaseCount(start: string, end: string) {
+    console.log('here');
+    const query = this.purchaseRepository
+      .createQueryBuilder('purchase')
+      .select('package.name', 'packageName')
+      .addSelect('COUNT(purchase.id)', 'purchaseCount')
+      .innerJoin('purchase.package', 'package')
+      .where(
+        'DATE(purchase.createdAt) >= :start AND DATE(purchase.createdAt) <= :end',
+        { start, end },
+      )
+      .groupBy('package.name');
+
+    return await query.getRawMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} report`;
+  async getPackageTagPurchaseCount(start: string, end: string) {
+    const query = this.purchaseRepository
+      .createQueryBuilder('purchase')
+      .select('tag.name', 'tag')
+      .addSelect('COUNT(purchase.id)', 'purchaseCount')
+      .innerJoin('purchase.package', 'package')
+      .innerJoin('package.tags', 'tag')
+      .where(
+        'DATE(purchase.createdAt) >= :start AND DATE(purchase.createdAt) <= :end',
+        { start, end },
+      )
+      .groupBy('tag.name');
+
+    return await query.getRawMany();
   }
 
-  update(id: number, updateReportDto: UpdateReportDto) {
-    return `This action updates a #${id} report`;
-  }
+  async getDailyPackageTransactionReport($start: string, $end: string) {
+    const start = new Date($start);
+    const end = new Date($end);
+    end.setHours(24, 0, 0, 0);
 
-  remove(id: number) {
-    return `This action removes a #${id} report`;
+    const query = this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('DATE(transaction.createdAt)', 'date')
+      .addSelect('SUM(transaction.amount)', 'totalAmount')
+      .where('transaction.type = :type', { type: TransactionType.PACKAGE })
+      // Use BETWEEN to ensure the query is inclusive of both start and end date
+      .andWhere('DATE(transaction.createdAt) BETWEEN :start AND :end', {
+        start,
+        end,
+      })
+      .groupBy('DATE(transaction.createdAt)')
+      .orderBy('DATE(transaction.createdAt)', 'ASC');
+
+    const result = await query.getRawMany();
+
+    const dateMap = new Map<string, number>();
+
+    result.forEach((r) => {
+      const localDate = new Date(r.date).toISOString().split('T')[0]; // Handle timezone issues
+      dateMap.set(localDate, +parseFloat(r.totalAmount).toFixed(2));
+    });
+
+    const dailyReport = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      dailyReport.push({
+        date: dateStr,
+        totalAmount: dateMap.get(dateStr) || 0,
+      });
+    }
+
+    return dailyReport;
   }
 }

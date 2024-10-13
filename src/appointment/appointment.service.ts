@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Repository } from 'typeorm';
@@ -52,12 +56,23 @@ export class AppointmentService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
+  async findOne(id: number) {
+    return await this.appointmentRepository.findOne({
+      where: {
+        id,
+      },
+    });
   }
 
-  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return `This action updates a #${id} appointment`;
+  async update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+    const appt = await this.findOne(id);
+    if (!appt) throw new NotFoundException('Appointment not found!');
+
+    Object.assign(appt, updateAppointmentDto);
+
+    console.log(updateAppointmentDto, 'update');
+    console.log(appt);
+    return await this.appointmentRepository.save(appt);
   }
 
   remove(id: number) {

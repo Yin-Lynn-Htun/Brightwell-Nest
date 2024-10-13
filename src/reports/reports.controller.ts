@@ -14,16 +14,16 @@ import { UpdateReportDto } from './dto/update-report.dto';
 
 @Controller('reports')
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) {}
+  constructor(private readonly reportService: ReportsService) {}
 
   @Get('monthly')
   async getMonthlyReport() {
-    return await this.reportsService.getMonthlyReport();
+    return await this.reportService.getMonthlyReport();
   }
 
   @Get('daily-transactions')
   async getDailyAppointmentTransactions() {
-    return await this.reportsService.getDailyTransactions();
+    return await this.reportService.getDailyTransactions();
   }
 
   @Get('/doctor-appointments')
@@ -31,7 +31,7 @@ export class ReportsController {
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
   ) {
-    return this.reportsService.getDoctorAppointmentReport(
+    return this.reportService.getDoctorAppointmentReport(
       new Date(startDate),
       new Date(endDate),
     );
@@ -45,7 +45,7 @@ export class ReportsController {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    return this.reportsService.getDoctorSpecialityAppointmentReport(start, end);
+    return this.reportService.getDoctorSpecialityAppointmentReport(start, end);
   }
 
   // New API for Appointment Transactions Report
@@ -57,26 +57,32 @@ export class ReportsController {
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    return this.reportsService.getAppointmentTransactionReport(start, end);
+    return this.reportService.getAppointmentTransactionReport(start, end);
   }
 
-  @Get()
-  findAll() {
-    return this.reportsService.findAll();
+  @Get('package-purchase-count')
+  getPackagePurchaseCount(
+    @Query('startDate') start: string,
+    @Query('endDate') end: string,
+  ) {
+    return this.reportService.getPackagePurchaseCount(start, end);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reportsService.findOne(+id);
+  // Package Tag Name and Purchase Count
+  @Get('package-tag-purchase-count')
+  async getPackageTagPurchaseCount(
+    @Query('startDate') start: string,
+    @Query('endDate') end: string,
+  ) {
+    return this.reportService.getPackageTagPurchaseCount(start, end);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReportDto: UpdateReportDto) {
-    return this.reportsService.update(+id, updateReportDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reportsService.remove(+id);
+  // Daily Package Transaction Report
+  @Get('daily-package-transaction-report')
+  async getDailyPackageTransactionReport(
+    @Query('startDate') start: string,
+    @Query('endDate') end: string,
+  ) {
+    return this.reportService.getDailyPackageTransactionReport(start, end);
   }
 }

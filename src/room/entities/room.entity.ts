@@ -1,6 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
 import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
-import { RoomCharge } from 'src/room-charge/entities/room-charge.entity';
 import { RoomType } from 'src/room-type/entities/room-type.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
 import {
