@@ -11,7 +11,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
-import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import {
+  CreateAppointmentDto,
+  CreateServiceAppointmentDto,
+} from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 import { Request } from 'express';
@@ -47,11 +50,31 @@ export class AppointmentController {
     return this.appointmentService.getAppointments(date, doctorIdArray);
   }
 
+  @Get('/service')
+  async getServiceAppointments(
+    @Query('date') date?: string,
+    @Query('type') type?: string,
+  ) {
+    return this.appointmentService.getServiceAppointments(date, type);
+  }
+
   @Get('/recent')
   async getRecentAppointments() {
     return this.appointmentService.getRecentAppointments();
   }
 
+  @Post('/service')
+  @UseGuards(JwtAuthGuard)
+  createService(
+    @Req() req: Request & { user: { id: number } },
+    @Body() createServiceAppointmentDto: CreateServiceAppointmentDto,
+  ) {
+    const patientId = req.user.id;
+    return this.appointmentService.bookServiceAppointment({
+      ...createServiceAppointmentDto,
+      patientId,
+    });
+  }
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.appointmentService.findOne(+id);

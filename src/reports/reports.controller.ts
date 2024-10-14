@@ -48,6 +48,17 @@ export class ReportsController {
     return this.reportService.getDoctorSpecialityAppointmentReport(start, end);
   }
 
+  @Get('/type-appointment')
+  async getAppointmentTypeReport(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    return this.reportService.getAppointmentTypeReport(start, end);
+  }
+
   // New API for Appointment Transactions Report
   @Get('/appointment-transaction')
   async getAppointmentTransactionReport(
@@ -84,5 +95,21 @@ export class ReportsController {
     @Query('endDate') end: string,
   ) {
     return this.reportService.getDailyPackageTransactionReport(start, end);
+  }
+
+  @Get('patient-report')
+  async getPatientReport(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.reportService.getPatientReport(startDate, endDate);
+  }
+
+  @Get('inpatient-report')
+  async getInpatientReport(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.reportService.getInpatientReport(startDate, endDate);
   }
 }

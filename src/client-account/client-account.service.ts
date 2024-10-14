@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClientAccountDto } from './dto/create-client-account.dto';
-import { UpdateClientAccountDto } from './dto/update-client-account.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Patient } from 'src/patients/entities/patient.entity';
-import { Repository } from 'typeorm';
 import * as moment from 'moment';
-import { AppointmentStatus } from 'src/constants';
+import { AppointmentStatus, AppointmentType } from 'src/constants';
+import { Patient } from 'src/patients/entities/patient.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
-import { TransactionService } from 'src/transaction/transaction.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ClientAccountService {
@@ -35,34 +32,67 @@ export class ClientAccountService {
     const groupedAppointments =
       patient?.appointments.reduce(
         (acc, appointment) => {
-          const scheduleDate = moment(appointment.slot.schedule.date).format(
-            'ddd, DD MMM YYYY',
-          );
+          console.log(appointment, 'appointments');
+          const isDoctorAppointment =
+            appointment.type === AppointmentType.DOCTOR;
 
-          // Check if this date already exists in the accumulator
+          let appointmentDetails: {
+            type: AppointmentType;
+            doctorName?: string;
+            specialties?: string;
+            time: string;
+            status: AppointmentStatus;
+          } | null = null;
+
+          let scheduleDate: any;
+
+          if (isDoctorAppointment) {
+            const date = appointment.slot?.date
+              ? appointment.slot?.date
+              : (appointment.slot?.schedule?.date ?? new Date());
+            scheduleDate = moment(date).format('ddd, DD MMM YYYY');
+
+            appointmentDetails = {
+              type: appointment.type,
+              doctorName:
+                'Dr. ' +
+                appointment.slot.schedule.doctor.user.firstName +
+                ' ' +
+                appointment.slot.schedule.doctor.user.lastName,
+              specialties: appointment.slot.schedule.doctor.specialties
+                .map((s) => s.name)
+                .join(', '),
+              time: `${moment(appointment.slot.startTime, 'HH:mm:ss').format('hh:mm A')} - ${moment(appointment.slot.endTime, 'HH:mm:ss').format('hh:mm A')}`,
+              status: appointment.status,
+            };
+          } else {
+            const date = appointment.slot.date
+              ? appointment.slot.date
+              : (appointment.slot.schedule?.date ?? new Date());
+            scheduleDate = moment(date).format('ddd, DD MMM YYYY');
+
+            appointmentDetails = {
+              type: appointment.type,
+
+              time: `${moment(appointment.slot.startTime, 'HH:mm:ss').format('hh:mm A')} - ${moment(appointment.slot.endTime, 'HH:mm:ss').format('hh:mm A')}`,
+              status: appointment.status,
+            };
+          }
+
+          // Check if this date already exists in the accumulators
           const existingGroup = acc.find(
             (group) => group.date === scheduleDate,
           );
 
-          const appointmentDetails = {
-            doctorName:
-              appointment.slot.schedule.doctor.user.firstName +
-              ' ' +
-              appointment.slot.schedule.doctor.user.lastName,
-            specialties: appointment.slot.schedule.doctor.specialties
-              .map((s) => s.name)
-              .join(', '),
-            time: `${moment(appointment.slot.startTime, 'HH:mm:ss').format('hh:mm A')} - ${moment(appointment.slot.endTime, 'HH:mm:ss').format('hh:mm A')}`,
-            status: appointment.status,
-          };
-
-          if (existingGroup) {
-            existingGroup.appointments.push(appointmentDetails);
-          } else {
-            acc.push({
-              appointments: [appointmentDetails],
-              date: scheduleDate,
-            });
+          if (appointmentDetails !== null) {
+            if (existingGroup) {
+              existingGroup.appointments.push(appointmentDetails);
+            } else {
+              acc.push({
+                appointments: [appointmentDetails],
+                date: scheduleDate,
+              });
+            }
           }
 
           return acc;
@@ -70,8 +100,8 @@ export class ClientAccountService {
         [] as Array<{
           date: string;
           appointments: {
-            doctorName: string;
-            specialties: string;
+            doctorName?: string;
+            specialties?: string;
             time: string;
             status: AppointmentStatus;
           }[];

@@ -17,10 +17,10 @@ export enum TransactionStatus {
 export enum TransactionType {
   PACKAGE = 'Package',
   APPOINTMENT = 'Appointment',
+  FOLLOW_UP_CHARGES = 'Follow_Up_Charges', // for appointment
   INPATIENT = 'Inpatient',
   DEPOSIT = 'Deposit',
   ROOM_DEPOSIT = 'RoomDeposit',
-  FOLLOW_UP_CHARGES = 'Follow_Up_Charges',
 }
 
 export enum TransactionChannel {

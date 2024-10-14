@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ValidationPipe } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,6 +15,7 @@ import {
 import { Purchase } from 'src/purchase/entities/purchase.entity';
 import * as moment from 'moment';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
+import { Patient } from 'src/patients/entities/patient.entity';
 
 @Injectable()
 export class ReportsService {
@@ -30,6 +31,9 @@ export class ReportsService {
 
     @InjectRepository(Inpatient)
     private inpatientRepository: Repository<Inpatient>,
+
+    @InjectRepository(Patient)
+    private patientRepository: Repository<Patient>,
 
     @InjectRepository(Inpatient)
     private doctorRepository: Repository<Doctor>,
@@ -292,6 +296,21 @@ export class ReportsService {
     return result;
   }
 
+  async getAppointmentTypeReport(startDate: Date, endDate: Date) {
+    const result = await this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .select('appointment.type', 'type')
+      .addSelect('COUNT(appointment.type)', 'bookings')
+      .where('appointment.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .groupBy('appointment.type')
+      .getRawMany();
+
+    return result;
+  }
+
   // Helper function to calculate percentage change
   private calculatePercentageChange(current: number, previous: number): number {
     if (previous === 0) return current > 0 ? 100 : 0;
@@ -367,5 +386,107 @@ export class ReportsService {
     }
 
     return dailyReport;
+  }
+
+  async getPatientReport(startDate: string, endDate: string) {
+    // Handle date range, default to all-time if no date range provided
+    const start = startDate ? new Date(startDate) : new Date('1970-01-01');
+    const end = endDate ? new Date(endDate) : new Date();
+
+    // Set the end date to include the whole day
+    end.setHours(23, 59, 59, 999);
+
+    const query = this.patientRepository
+      .createQueryBuilder('patient')
+      .leftJoin(
+        'patient.transactions',
+        'transaction',
+        'transaction.createdAt BETWEEN :start AND :end',
+        { start, end },
+      )
+      .leftJoin(
+        'patient.appointments',
+        'appointment',
+        'appointment.createdAt BETWEEN :start AND :end',
+        { start, end },
+      )
+      .leftJoin(
+        'patient.purchases',
+        'purchase',
+        'purchase.createdAt BETWEEN :start AND :end',
+        { start, end },
+      )
+      .leftJoin(
+        'patient.inpatients',
+        'inpatients',
+        'inpatients.createdAt BETWEEN :start AND :end',
+        { start, end },
+      )
+      .select([
+        'patient.id',
+        'patient.firstName',
+        'patient.lastName',
+        'patient.email',
+        'patient.phoneNumber',
+      ])
+      .addSelect('COALESCE(SUM(transaction.amount), 0)', 'transactionAmount') // Sum transactions, default to 0
+      .addSelect('COUNT(DISTINCT appointment.id)', 'appointmentCount') // Count appointments, default to 0
+      .addSelect('COUNT(DISTINCT purchase.id)', 'purchaseCount') // Count purchases, default to 0
+      .addSelect('COUNT(DISTINCT inpatients.id)', 'roomBookingCount') // Count room bookings, default to 0
+      .groupBy('patient.id')
+      .orderBy('COALESCE(SUM(transaction.amount), 0)', 'DESC'); // Order by transactionAmount, default to 0
+
+    const result = await query.getRawMany();
+
+    // Transform the data to the required format
+    const patientReport = result.map((r) => ({
+      name: `${r.patient_firstName} ${r.patient_lastName}`,
+      email: r.patient_email,
+      phoneNumber: r.patient_phoneNumber,
+      transactionAmount: parseFloat(r.transactionAmount).toFixed(2),
+      appointmentCount: r.appointmentCount,
+      purchaseCount: r.purchaseCount,
+      roomBookingCount: r.roomBookingCount,
+    }));
+
+    return patientReport;
+  }
+
+  async getInpatientReport(startDate: string, endDate: string) {
+    const queryBuilder = this.inpatientRepository
+      .createQueryBuilder('inpatient')
+      .leftJoinAndSelect('inpatient.patient', 'patient')
+      .leftJoinAndSelect('inpatient.room', 'room')
+      .leftJoinAndSelect('inpatient.deposits', 'deposit')
+      .where('inpatient.startDate BETWEEN :startDate AND :endDate', {
+        startDate: `${startDate} 00:00:00`,
+        endDate: `${endDate} 23:59:59`,
+      });
+
+    const inpatients = await queryBuilder.getMany();
+
+    return inpatients.map((inpatient) => {
+      const totalTransaction = inpatient.deposits
+        ? inpatient.deposits.reduce((sum, deposit) => {
+            // Ensure deposit amount is a valid number, default to 0 if not
+            return (
+              sum + (deposit.amount ? parseFloat(deposit.amount.toString()) : 0)
+            );
+          }, 0)
+        : 0;
+
+      return {
+        inpatientId: inpatient.id,
+        patientName: `${inpatient.patient.firstName} ${inpatient.patient.lastName}`,
+        phoneNumber: inpatient.patient.phoneNumber,
+        roomNo: inpatient.room ? inpatient.room.name : 'No Room Assigned',
+        totalTransaction: totalTransaction.toFixed(2), // Format totalTransaction to 2 decimal places
+        admittedOn: moment(new Date(inpatient.startDate)).format('MMM Do YYYY'),
+        dischargedOn: inpatient.endDate
+          ? moment(new Date(inpatient.endDate)).format('MMM Do YYYY')
+          : '--',
+        status: inpatient.status,
+      };
+    });
   }
 }

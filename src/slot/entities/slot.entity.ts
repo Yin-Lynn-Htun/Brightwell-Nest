@@ -20,6 +20,9 @@ export class Slot {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  date: string;
+
   @Column({ type: 'time' })
   startTime: string;
 

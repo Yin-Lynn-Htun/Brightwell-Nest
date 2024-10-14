@@ -7,6 +7,7 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
 import { Inpatient } from 'src/inpatient/entities/inpatient.entity';
 import { Purchase } from 'src/purchase/entities/purchase.entity';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
+import { Patient } from 'src/patients/entities/patient.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Doctor } from 'src/doctor/entities/doctor.entity';
       Inpatient,
       Purchase,
       Doctor,
+      Patient,
     ]),
   ],
   controllers: [ReportsController],

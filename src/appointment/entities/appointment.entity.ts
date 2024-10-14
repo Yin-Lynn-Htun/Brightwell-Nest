@@ -1,4 +1,4 @@
-import { AppointmentStatus } from 'src/constants';
+import { AppointmentStatus, AppointmentType } from 'src/constants';
 import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';
@@ -26,8 +26,24 @@ export class Appointment {
   @OneToOne(() => Slot, (slot) => slot.appointment)
   slot: Slot; // Optional relation
 
+  @Column({
+    type: 'enum',
+    enum: AppointmentType,
+    default: AppointmentType.DOCTOR,
+  })
+  type: AppointmentType;
+
   @Column({ type: 'enum', enum: AppointmentStatus })
   status: AppointmentStatus;
+
+  @Column('text', { nullable: true })
+  description: string;
+
+  @Column('text', { array: true, nullable: true }) // This defines an array of strings
+  attachments: string[];
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  allergy: string;
 
   @CreateDateColumn()
   createdAt: Date;

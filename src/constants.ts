@@ -10,6 +10,12 @@ export enum DayOfWeek {
   SATURDAY = 'Saturday',
 }
 
+export enum AppointmentType {
+  DOCTOR = 'Doctor',
+  MEDICAL_CHECKUP = 'Medical-Checkup',
+  VACCINATION = 'Vaccination',
+}
+
 export enum AppointmentStatus {
   BOOKED = 'Booked',
   CANCELED = 'Canceled',

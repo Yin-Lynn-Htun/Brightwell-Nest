@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SlotService } from './slot.service';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { UpdateSlotDto } from './dto/update-slot.dto';
+import { AppointmentType } from 'src/constants';
 
 @Controller('slot')
 export class SlotController {
@@ -23,6 +25,13 @@ export class SlotController {
   @Get()
   findAll() {
     return this.slotService.findAll();
+  }
+
+  @Get('schedule')
+  getAppointmentSlots(@Query('type') type: AppointmentType) {
+    return this.slotService.generateSlotsForTwoWeeks(
+      type ? type : AppointmentType.MEDICAL_CHECKUP,
+    );
   }
 
   @Get(':id')

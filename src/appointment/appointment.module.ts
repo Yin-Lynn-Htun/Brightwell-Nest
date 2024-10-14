@@ -6,10 +6,11 @@ import { Appointment } from './entities/appointment.entity';
 import { PatientsModule } from 'src/patients/patients.module';
 import { ScheduleModule } from 'src/schedule/schedule.module';
 import { SlotModule } from 'src/slot/slot.module';
+import { Slot } from 'src/slot/entities/slot.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Appointment]),
+    TypeOrmModule.forFeature([Appointment, Slot]),
     PatientsModule,
     ScheduleModule,
     SlotModule,

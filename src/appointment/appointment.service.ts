@@ -3,16 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import {
+  CreateAppointmentDto,
+  CreateServiceAppointmentDto,
+} from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
 import { PatientsService } from 'src/patients/patients.service';
-import { ScheduleService } from 'src/schedule/schedule.service';
-import { AppointmentStatus } from 'src/constants';
+import { AppointmentStatus, AppointmentType } from 'src/constants';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SlotService } from 'src/slot/slot.service';
 import { Slot, SlotStatus } from 'src/slot/entities/slot.entity';
+import * as moment from 'moment';
 
 @Injectable()
 export class AppointmentService {
@@ -21,6 +24,9 @@ export class AppointmentService {
     private readonly appointmentRepository: Repository<Appointment>,
     private readonly patientService: PatientsService,
     private readonly slotService: SlotService,
+
+    @InjectRepository(Slot)
+    private readonly slotRepository: Repository<Slot>,
   ) {}
 
   async create(
@@ -70,8 +76,6 @@ export class AppointmentService {
 
     Object.assign(appt, updateAppointmentDto);
 
-    console.log(updateAppointmentDto, 'update');
-    console.log(appt);
     return await this.appointmentRepository.save(appt);
   }
 
@@ -90,6 +94,7 @@ export class AppointmentService {
 
     // Apply doctor filter if doctorIds are provided
     if (doctorIds && doctorIds.length > 0) {
+      console.log('here doctor Ids', doctorIds);
       query.andWhere('doctor.doctorId IN (:...doctorIds)', { doctorIds });
     }
 
@@ -122,6 +127,45 @@ export class AppointmentService {
     }));
   }
 
+  async getServiceAppointments(date?: string, type?: string) {
+    const query = this.appointmentRepository
+      .createQueryBuilder('appointment')
+      .innerJoinAndSelect('appointment.slot', 'slot') // Join slot relation
+      .innerJoinAndSelect('appointment.patient', 'patient'); // Join patient relation
+
+    if (type) {
+      query.andWhere('appointment.type', { type });
+    } else {
+      query.andWhere('appointment.type IN (:...type)', {
+        type: [AppointmentType.MEDICAL_CHECKUP, AppointmentType.VACCINATION],
+      });
+    }
+
+    // Apply date filter if provided, otherwise fetch both history and upcoming
+    if (date) {
+      const specificDate = new Date(date);
+
+      // Set start and end of the specific date (midnight to 11:59:59)
+      const startOfDay = new Date(specificDate.setHours(0, 0, 0, 0)); // Midnight
+      const endOfDay = new Date(specificDate.setHours(23, 59, 59, 59)); // 23:59:59
+
+      query.andWhere('slot.date BETWEEN :startOfDay AND :endOfDay', {
+        startOfDay,
+        endOfDay,
+      });
+    } else {
+      // If no date provided, fetch both past (history) and upcoming appointments
+      query.orderBy('slot.date', 'ASC');
+    }
+
+    const appointments = await query.getMany();
+
+    return appointments.map((appointment) => ({
+      ...appointment,
+      patient: appointment.patient,
+    }));
+  }
+
   async getRecentAppointments() {
     return this.appointmentRepository.find({
       relations: {
@@ -134,32 +178,56 @@ export class AppointmentService {
     });
   }
 
-  private groupAppointmentsByDate(appointments: Appointment[]) {
-    return appointments.reduce((grouped: GroupedAppointment[], appointment) => {
-      const appointmentDate = new Date(appointment.slot.schedule.date)
-        .toISOString()
-        .split('T')[0]; // Extract the date part
+  // Method to handle booking an appointment
+  async bookServiceAppointment({
+    patientId,
+    medicalType,
+    date,
+    startTime,
+    endTime,
+    allergy,
+    attachments,
+    description,
+  }: CreateServiceAppointmentDto & {
+    patientId: number;
+  }): Promise<Appointment> {
+    // Check if the slot already exists
+    let slot = await this.slotRepository.findOne({
+      where: {
+        startTime: startTime,
+        endTime: endTime,
+        status: SlotStatus.Available, // Check only available slots
+      },
+    });
 
-      // Find if the date already exists in the result
-      let dateGroup = grouped.find((group) => group.date === appointmentDate);
+    if (!slot) {
+      // If no slot exists, create a new one
+      slot = new Slot();
+      slot.date = date;
+      slot.startTime = startTime;
+      slot.endTime = endTime;
+      slot.status = SlotStatus.Booked; // Mark it as booked immediately
+      slot = await this.slotRepository.save(slot);
+    } else {
+      // If the slot exists, mark it as "Booked"
+      slot.status = SlotStatus.Booked;
+      await this.slotRepository.save(slot);
+    }
 
-      // If the date group doesn't exist, create a new one
-      if (!dateGroup) {
-        dateGroup = {
-          date: appointmentDate,
-          appointments: [],
-        };
-        grouped.push(dateGroup);
-      }
+    const patient = await this.patientService.findOne(patientId);
 
-      // Add the appointment data to the date's appointments array
-      dateGroup.appointments.push({
-        slot: appointment.slot,
-        doctor: appointment.slot.schedule.doctor, // Make sure doctor is loaded
-        patient: appointment.patient,
-      });
+    if (!patient) throw new NotFoundException('Patient not found!');
 
-      return grouped;
-    }, [] as GroupedAppointment[]);
+    const appointment = new Appointment();
+    appointment.patient = patient;
+    appointment.slot = slot;
+    appointment.type = medicalType;
+    appointment.status = AppointmentStatus.BOOKED;
+    appointment.allergy = allergy ?? '';
+    appointment.attachments = attachments ?? [];
+    appointment.description = description ?? '';
+    await this.appointmentRepository.save(appointment);
+
+    return appointment;
   }
 }
