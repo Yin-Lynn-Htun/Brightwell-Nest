@@ -1,13 +1,5 @@
-import { DepositService } from './../deposit/deposit.service';
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  UseGuards,
-  forwardRef,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { CreateInpatientDto, AssignRoomDto } from './dto/create-inpatient.dto';
-import { UpdateInpatientDto } from './dto/update-inpatient.dto';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inpatient } from './entities/inpatient.entity';
@@ -22,8 +14,6 @@ import {
   TransactionStatus,
   TransactionType,
 } from 'src/transaction/entities/transaction.entity';
-import { DepositStatus } from 'src/deposit/entities/deposit.entity';
-import { InpatientChargeService } from 'src/inpatient-charge/inpatient-charge.service';
 
 @Injectable()
 export class InpatientService {
@@ -125,14 +115,7 @@ export class InpatientService {
       where: {
         id,
       },
-      relations: [
-        'patient',
-        'roomType',
-        'roomType.charges',
-        'room',
-        'deposits',
-        'charges',
-      ],
+      relations: ['patient', 'roomType', 'roomType.charges', 'room', 'charges'],
     });
 
     if (!inpatient) {
@@ -171,10 +154,6 @@ export class InpatientService {
     });
 
     return this.inpatientRepository.save(inpatient);
-  }
-
-  update(id: number, updateInpatientDto: UpdateInpatientDto) {
-    return `This action updates a #${id} inpatient`;
   }
 
   remove(id: number) {

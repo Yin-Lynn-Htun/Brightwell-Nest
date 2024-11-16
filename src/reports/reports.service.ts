@@ -457,35 +457,49 @@ export class ReportsService {
       .createQueryBuilder('inpatient')
       .leftJoinAndSelect('inpatient.patient', 'patient')
       .leftJoinAndSelect('inpatient.room', 'room')
-      .leftJoinAndSelect('inpatient.deposits', 'deposit')
+      .leftJoin(
+        'transaction',
+        'transaction',
+        'transaction.referenceId = inpatient.id',
+      )
+      .addSelect('transaction.amount', 'transactionAmount')
+      .addSelect('transaction.referenceId', 'transactionReferenceId')
       .where('inpatient.startDate BETWEEN :startDate AND :endDate', {
         startDate: `${startDate} 00:00:00`,
         endDate: `${endDate} 23:59:59`,
       });
 
-    const inpatients = await queryBuilder.getMany();
+    // Fetch raw data since transactions are not part of the inpatient model
+    const inpatients = await queryBuilder.getRawMany();
+
+    console.log(inpatients, 'inpatients');
 
     return inpatients.map((inpatient) => {
-      const totalTransaction = inpatient.deposits
-        ? inpatient.deposits.reduce((sum, deposit) => {
-            // Ensure deposit amount is a valid number, default to 0 if not
-            return (
-              sum + (deposit.amount ? parseFloat(deposit.amount.toString()) : 0)
-            );
-          }, 0)
-        : 0;
+      // Filter relevant transactions for this inpatient
+      const relatedTransactions = inpatients.filter(
+        (t) => t.transactionReferenceId === inpatient.inpatient_id,
+      );
+
+      const totalTransaction = relatedTransactions.reduce(
+        (sum, transaction) => {
+          return sum + (+transaction.transactionAmount || 0);
+        },
+        0,
+      );
 
       return {
-        inpatientId: inpatient.id,
-        patientName: `${inpatient.patient.firstName} ${inpatient.patient.lastName}`,
-        phoneNumber: inpatient.patient.phoneNumber,
-        roomNo: inpatient.room ? inpatient.room.name : 'No Room Assigned',
-        totalTransaction: totalTransaction.toFixed(2), // Format totalTransaction to 2 decimal places
-        admittedOn: moment(new Date(inpatient.startDate)).format('MMM Do YYYY'),
-        dischargedOn: inpatient.endDate
-          ? moment(new Date(inpatient.endDate)).format('MMM Do YYYY')
+        inpatientId: inpatient.inpatient_id,
+        patientName: `${inpatient.patient_firstName} ${inpatient.patient_lastName}`,
+        phoneNumber: inpatient.patient_phoneNumber,
+        roomNo: inpatient.room_name || 'No Room Assigned',
+        totalTransaction: totalTransaction, // Format to 2 decimal places
+        admittedOn: moment(new Date(inpatient.inpatient_startDate)).format(
+          'MMM Do YYYY',
+        ),
+        dischargedOn: inpatient.inpatient_endDate
+          ? moment(new Date(inpatient.inpatient_endDate)).format('MMM Do YYYY')
           : '--',
-        status: inpatient.status,
+        status: inpatient.inpatient_status,
       };
     });
   }

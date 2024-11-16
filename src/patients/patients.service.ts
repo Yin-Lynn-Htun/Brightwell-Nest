@@ -1,13 +1,6 @@
-import {
-  Body,
-  Injectable,
-  NotFoundException,
-  Post,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
-import { patients } from 'src/dummy/patients';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Patient } from './entities/patient.entity';
 import { Repository } from 'typeorm';
@@ -43,15 +36,15 @@ export class PatientsService {
   }
 
   async update(id: number, updatePatientDto: UpdatePatientDto) {
-    const city = await this.findOne(id);
+    const doctor = await this.findOne(id);
 
-    if (!city) {
+    if (!doctor) {
       throw new NotFoundException();
     }
 
-    Object.assign(city, updatePatientDto);
+    Object.assign(doctor, updatePatientDto);
 
-    return await this.patientsRespository.save(city);
+    return await this.patientsRespository.save(doctor);
   }
 
   async remove(id: number) {

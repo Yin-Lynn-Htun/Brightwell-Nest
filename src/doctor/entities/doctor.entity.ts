@@ -1,4 +1,3 @@
-import { IsEnum, IsNotEmpty } from 'class-validator';
 import { DoctorEdu } from 'src/doctor-edu/entities/doctor-edu.entity';
 import { MedicalHistory } from 'src/medical-history/entities/medical-history.entity';
 import { Schedule } from 'src/schedule/entities/schedule.entity';

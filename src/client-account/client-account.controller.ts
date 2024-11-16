@@ -35,6 +35,12 @@ export class ClientAccountController {
     return this.clientAccountService.getRooms(req.user.id);
   }
 
+  @Get('/medical-histories')
+  @UseGuards(JwtAuthGuard)
+  medicalHistories(@Req() req: Request & { user: { id: number } }) {
+    return this.clientAccountService.getMedicalHistories(req.user.id);
+  }
+
   // @Get('/transactions')
   // @UseGuards(JwtAuthGuard)
   // transactions(@Req() req: Request & { user: { id: number } }) {

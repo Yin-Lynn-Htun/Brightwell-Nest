@@ -56,4 +56,18 @@ export class UserService {
 
     return { ...data, doctorId };
   }
+
+  async findOneWithoutUser(id: number) {
+    const data = await this.userRespository.findOne({
+      where: {
+        userId: id,
+      },
+    });
+
+    return data;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRespository.findOne({ where: { email } });
+  }
 }

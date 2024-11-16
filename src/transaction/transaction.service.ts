@@ -1,10 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PatientsService } from 'src/patients/patients.service';
 import { Repository } from 'typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { Transaction, TransactionStatus } from './entities/transaction.entity';
+import {
+  Transaction,
+  TransactionStatus,
+  TransactionType,
+} from './entities/transaction.entity';
+import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 
 @Injectable()
 export class TransactionService {
@@ -88,9 +93,10 @@ export class TransactionService {
 
   async getInpatientTransaction(inpatientId: number) {
     const inpatients = await this.transactionRepository.find({
-      where: {
-        referenceId: inpatientId,
-      },
+      where: [
+        { referenceId: inpatientId, type: TransactionType.INPATIENT },
+        { referenceId: inpatientId, type: TransactionType.ROOM_DEPOSIT },
+      ],
     });
 
     return inpatients;

@@ -15,14 +15,14 @@ import { CreateMedicalHistoryDto } from './dto/create-medical-history.dto';
 import { UpdateMedicalHistoryDto } from './dto/update-medical-history.dto';
 import { JwtAdminGuard } from 'src/auth/jwt.guard';
 import { PatientsService } from 'src/patients/patients.service';
-import { DoctorService } from 'src/doctor/doctor.service';
+import { UserService } from 'src/user/user.service';
 
 @Controller('medical-history')
 export class MedicalHistoryController {
   constructor(
     private readonly medicalHistoryService: MedicalHistoryService,
     private readonly patientService: PatientsService, // Assuming there's a service for Patient entity
-    private readonly doctorService: DoctorService, // Assuming there's a service for Patient entity
+    private readonly userService: UserService,
   ) {}
 
   @Post(':patientId')
@@ -37,13 +37,16 @@ export class MedicalHistoryController {
     if (!patient) {
       throw new NotFoundException(`Patient with ID ${patientId} not found`);
     }
-    const doctor = await this.doctorService.findByUserId(req.user.userId);
+    const user = await this.userService.findOneWithoutUser(req.user.userId);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${req.user.userId} not found`);
+    }
 
     // Pass patient and user along with the DTO to the service
     return this.medicalHistoryService.create(
       createMedicalHistoryDto,
       patient,
-      doctor,
+      user,
     );
   }
 

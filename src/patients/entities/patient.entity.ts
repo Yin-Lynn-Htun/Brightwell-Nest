@@ -3,9 +3,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
-  UpdateDateColumn,
   OneToMany,
-  ManyToOne,
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
 import { Appointment } from 'src/appointment/entities/appointment.entity';

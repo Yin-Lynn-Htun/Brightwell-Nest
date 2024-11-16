@@ -28,8 +28,9 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
+  @IsOptional()
   @Length(1, 254)
-  imageUrl: string;
+  imageUrl?: string;
 
   @IsOptional()
   @IsString()
@@ -39,7 +40,7 @@ export class CreateUserDto {
   phoneNumber: string;
 
   @IsString()
-  password: string;
+  password?: string;
 
   @IsEnum(Role)
   role: Role; // Assuming role is stored by its ID
@@ -103,4 +104,6 @@ export class CreateUserDto {
   @IsString()
   @Length(1, 50)
   nationality: string = 'myanmar';
+
+  description: string;
 }

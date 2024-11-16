@@ -1,13 +1,10 @@
 import { AppointmentStatus, AppointmentType } from 'src/constants';
-import { Doctor } from 'src/doctor/entities/doctor.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
-import { Schedule } from 'src/schedule/entities/schedule.entity';
 import { Slot } from 'src/slot/entities/slot.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,

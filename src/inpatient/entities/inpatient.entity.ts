@@ -1,7 +1,6 @@
 import { InpatientStatus } from 'src/constants';
 import { Deposit } from 'src/deposit/entities/deposit.entity';
 import { InpatientCharge } from 'src/inpatient-charge/entities/inpatient-charge.entity';
-import { Package } from 'src/package/entities/package.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
 import { RoomType } from 'src/room-type/entities/room-type.entity';
 import { Room } from 'src/room/entities/room.entity';

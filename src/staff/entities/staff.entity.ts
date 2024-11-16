@@ -39,20 +39,4 @@ export class Staff {
   @Column({ type: 'varchar', length: 50 })
   @IsNotEmpty()
   department: string;
-
-  @Column({ type: 'date' })
-  employmentStartDate: string;
-
-  @Column({ type: 'date', nullable: true })
-  employmentEndDate: string;
-
-  @Column({ type: 'boolean', nullable: true })
-  isCurrentlyWorking: string;
-
-  @Column({ type: 'enum', enum: EmploymentType })
-  @IsEnum(EmploymentType)
-  employmentType: EmploymentType;
-
-  @Column({ type: 'varchar', length: 20 })
-  staffPassNo: string;
 }

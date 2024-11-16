@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { InpatientService } from './inpatient.service';
 import { AssignRoomDto, CreateInpatientDto } from './dto/create-inpatient.dto';
-import { UpdateInpatientDto } from './dto/update-inpatient.dto';
 import { JwtAuthGuard } from 'src/client-auth/client-jwt.guard';
 import { JwtAdminGuard } from 'src/auth/jwt.guard';
 
@@ -70,14 +69,6 @@ export class InpatientController {
   @UseGuards(JwtAuthGuard)
   payDeposit(@Param('id') id: string) {
     return this.inpatientService.payRoomDeposit(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateInpatientDto: UpdateInpatientDto,
-  ) {
-    return this.inpatientService.update(+id, updateInpatientDto);
   }
 
   @Delete(':id')

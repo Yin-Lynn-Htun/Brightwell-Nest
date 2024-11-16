@@ -6,8 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
-  UseGuards,
   Query,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
@@ -18,9 +16,12 @@ import { UpdateTransactionDto } from './dto/update-transaction.dto';
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
+  // cannot use auth as it can be called from both portal
   @Post()
   create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.create(createTransactionDto);
+    return this.transactionService.create({
+      ...createTransactionDto,
+    });
   }
 
   @Get()

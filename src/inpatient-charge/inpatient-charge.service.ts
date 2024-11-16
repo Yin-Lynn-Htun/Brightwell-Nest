@@ -1,9 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  forwardRef,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInpatientChargeDto } from './dto/create-inpatient-charge.dto';
 import { UpdateInpatientChargeDto } from './dto/update-inpatient-charge.dto';
 import { InpatientCharge } from './entities/inpatient-charge.entity';
@@ -87,12 +82,25 @@ export class InpatientChargeService {
     return `This action returns all inpatientCharge`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inpatientCharge`;
+  async findOne(id: number) {
+    const inpatientCharge = await this.inpatientChargeRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    return inpatientCharge;
   }
 
-  update(id: number, updateInpatientChargeDto: UpdateInpatientChargeDto) {
-    return `This action updates a #${id} inpatientCharge`;
+  async update(id: number, updateInpatientChargeDto: UpdateInpatientChargeDto) {
+    const inpatientCharge = await this.findOne(id);
+    if (!inpatientCharge) {
+      throw new NotFoundException();
+    }
+
+    Object.assign(inpatientCharge, updateInpatientChargeDto);
+
+    return await this.inpatientChargeRepository.save(inpatientCharge);
   }
 
   remove(id: number) {

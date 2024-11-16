@@ -6,7 +6,7 @@ import { UpdateMedicalHistoryDto } from './dto/update-medical-history.dto';
 
 import { MedicalHistory } from './entities/medical-history.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
-import { Doctor } from 'src/doctor/entities/doctor.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class MedicalHistoryService {
@@ -18,12 +18,12 @@ export class MedicalHistoryService {
   async create(
     createMedicalHistoryDto: CreateMedicalHistoryDto,
     patient: Patient,
-    doctor: Doctor,
+    user: User,
   ): Promise<MedicalHistory> {
     const medicalHistory = this.medicalHistoryRepository.create({
       ...createMedicalHistoryDto,
       patient,
-      createdBy: doctor,
+      createdBy: user,
     });
     return await this.medicalHistoryRepository.save(medicalHistory);
   }
@@ -41,7 +41,7 @@ export class MedicalHistoryService {
           id: patientId,
         },
       },
-      relations: ['patient', 'createdBy', 'createdBy.user'],
+      relations: ['patient', 'createdBy'],
     });
   }
 

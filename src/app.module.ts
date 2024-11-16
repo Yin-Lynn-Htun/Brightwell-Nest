@@ -2,13 +2,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CatsController } from './cats/cats.controller';
 import { PatientsModule } from './patients/patients.module';
-import { CatsService } from './cats/cats.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
-import { CitiesModule } from './cities/cities.module';
 import { SpecialitiesModule } from './specialities/specialities.module';
 import { StaffModule } from './staff/staff.module';
 
@@ -16,13 +13,11 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { DoctorModule } from './doctor/doctor.module';
 import { DoctorEduModule } from './doctor-edu/doctor-edu.module';
-import { DoctorExpModule } from './doctor-exp/doctor-exp.module';
 import { PackageModule } from './package/package.module';
 import { TagModule } from './tag/tag.module';
 import { ScheduleModule as NestScheduleModule } from '@nestjs/schedule';
 import { ScheduleModule } from './schedule/schedule.module';
 import { AppointmentModule } from './appointment/appointment.module';
-import { ScheduleJobsModule } from './schedule-jobs/schedule-jobs.module';
 import { ClientAuthService } from './client-auth/client-auth.service';
 import { ClientAuthModule } from './client-auth/client-auth.module';
 import { ClientAccountModule } from './client-account/client-account.module';
@@ -38,10 +33,11 @@ import { DepositModule } from './deposit/deposit.module';
 import { SlotModule } from './slot/slot.module';
 import { MedicalHistoryModule } from './medical-history/medical-history.module';
 import { ReportsModule } from './reports/reports.module';
+import { SeedService } from './seeders/seed.service';
 
 @Module({
-  controllers: [AppController, CatsController],
-  providers: [AppService, CatsService, ClientAuthService],
+  controllers: [AppController],
+  providers: [AppService, ClientAuthService, SeedService],
   imports: [
     NestScheduleModule.forRoot(),
     ConfigModule.forRoot(),
@@ -65,7 +61,6 @@ import { ReportsModule } from './reports/reports.module';
         expiresIn: '24h', // TOKEN EXPIRY TIME
       },
     }),
-    CitiesModule,
     PatientsModule,
     SpecialitiesModule,
     StaffModule,
@@ -73,12 +68,10 @@ import { ReportsModule } from './reports/reports.module';
     UserModule,
     DoctorModule,
     DoctorEduModule,
-    DoctorExpModule,
     PackageModule,
     TagModule,
     ScheduleModule,
     AppointmentModule,
-    ScheduleJobsModule,
     ClientAuthModule,
     ClientAccountModule,
     PurchaseModule,

@@ -140,6 +140,17 @@ export class ClientAccountService {
     return data?.inpatients ?? [];
   }
 
+  async getMedicalHistories(patientId: number) {
+    const data = await this.patientsRespository.findOne({
+      where: {
+        id: patientId,
+      },
+      relations: ['medicalHistories', 'medicalHistories.createdBy'],
+    });
+
+    return data?.medicalHistories ?? [];
+  }
+
   async getTransactions(patientId: number) {
     const data = await this.transactionRepository.find({
       where: {

@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { IsEmail, IsEnum, IsNotEmpty, IsPostalCode } from 'class-validator';
+import { MedicalHistory } from 'src/medical-history/entities/medical-history.entity';
 
 export enum Gender {
   Male = 'Male',
@@ -130,4 +131,7 @@ export class User {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @OneToMany(() => MedicalHistory, (medicalHistory) => medicalHistory.createdBy)
+  medicalHistories: MedicalHistory[];
 }

@@ -4,13 +4,13 @@ import { MedicalHistoryController } from './medical-history.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MedicalHistory } from './entities/medical-history.entity';
 import { PatientsModule } from 'src/patients/patients.module';
-import { DoctorModule } from 'src/doctor/doctor.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MedicalHistory]),
     PatientsModule,
-    DoctorModule,
+    UserModule,
   ],
   controllers: [MedicalHistoryController],
   providers: [MedicalHistoryService],

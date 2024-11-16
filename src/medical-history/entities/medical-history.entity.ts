@@ -4,12 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToOne,
-  OneToMany,
 } from 'typeorm';
 
 import { User } from 'src/user/entities/user.entity';
 import { Patient } from 'src/patients/entities/patient.entity';
-import { Doctor } from 'src/doctor/entities/doctor.entity';
 
 export enum MedicalHistoryCategory {
   General = 'General',
@@ -44,8 +42,8 @@ export class MedicalHistory {
   @Column('text', { array: true, nullable: true }) // This defines an array of strings
   attachments: string[];
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.medicalHistories)
-  createdBy: Doctor;
+  @ManyToOne(() => User, (user) => user.medicalHistories)
+  createdBy: User;
 
   @CreateDateColumn()
   created_at: Date;
