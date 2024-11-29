@@ -36,15 +36,16 @@ export class PatientsService {
   }
 
   async update(id: number, updatePatientDto: UpdatePatientDto) {
-    const doctor = await this.findOne(id);
+    const patient = await this.findOne(id);
 
-    if (!doctor) {
+    if (!patient) {
       throw new NotFoundException();
     }
 
-    Object.assign(doctor, updatePatientDto);
+    Object.assign(patient, updatePatientDto);
 
-    return await this.patientsRespository.save(doctor);
+    const data = await this.patientsRespository.save(patient);
+    return { ...data, responseMessage: 'Patient updated successfully!' };
   }
 
   async remove(id: number) {
@@ -54,7 +55,8 @@ export class PatientsService {
       throw new NotFoundException();
     }
 
-    return await this.patientsRespository.remove(patient);
+    const data = await this.patientsRespository.remove(patient);
+    return { ...data, responseMessage: 'Patient deleted successfully!' };
   }
 
   async findByEmail(email: string) {

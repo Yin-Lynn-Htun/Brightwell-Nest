@@ -18,7 +18,9 @@ export class Purchase {
   @ManyToOne(() => Patient, (patient) => patient.purchases)
   patient: Patient;
 
-  @ManyToOne(() => Package, (pkg) => pkg.purchases)
+  @ManyToOne(() => Package, (pkg) => pkg.purchases, {
+    onDelete: 'CASCADE',
+  })
   package: Package; // Optional relation
 
   @Column({ type: 'enum', enum: PurchaseStatus })

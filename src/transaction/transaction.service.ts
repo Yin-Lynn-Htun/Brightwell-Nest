@@ -23,6 +23,7 @@ export class TransactionService {
     const { amount, referenceId, type, status, channel, patientId } =
       createTransactionDto;
     const patient = await this.patientService.findOne(patientId);
+    console.log(patientId, patient, 'here');
     if (!patient) throw new NotFoundException('No patient found!');
 
     const transaction = this.transactionRepository.create({

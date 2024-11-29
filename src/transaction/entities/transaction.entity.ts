@@ -38,7 +38,9 @@ export class Transaction {
   @Column('decimal')
   amount: number;
 
-  @ManyToOne(() => Patient, (patient) => patient.transactions)
+  @ManyToOne(() => Patient, (patient) => patient.transactions, {
+    onDelete: 'CASCADE',
+  })
   patient: Patient;
 
   @Column({

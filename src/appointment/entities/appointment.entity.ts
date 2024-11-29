@@ -17,7 +17,9 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Patient, (patient) => patient.appointments)
+  @ManyToOne(() => Patient, (patient) => patient.appointments, {
+    onDelete: 'SET NULL',
+  })
   patient: Patient;
 
   @OneToOne(() => Slot, (slot) => slot.appointment)

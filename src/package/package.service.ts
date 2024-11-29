@@ -37,7 +37,8 @@ export class PackageService {
       tags: tagObjs,
     });
 
-    return await this.packageRepository.save(pkg);
+    const data = await this.packageRepository.save(pkg);
+    return { ...data, responseMessage: 'Package is created successfully.' };
   }
 
   async findAll() {
@@ -62,8 +63,33 @@ export class PackageService {
       throw new NotFoundException();
     }
 
-    Object.assign(pkg, updatePackageDto);
-    return await this.packageRepository.save(pkg);
+    const { tags } = updatePackageDto;
+    let tagObjs: any[] = [];
+
+    if (tags?.length) {
+      tagObjs = await Promise.all(
+        tags.map(async (tag) => {
+          if (isNaN(tag as any)) {
+            return await this.tagRepository.create({ name: tag });
+          } else {
+            const val = await this.tagRepository.findOne(tag as any);
+
+            if (!val) {
+              return await this.tagRepository.create({ name: tag });
+            }
+            return val;
+          }
+        }),
+      );
+    }
+
+    Object.assign(pkg, { ...updatePackageDto, tags: tagObjs });
+
+    const data = await this.packageRepository.save(pkg);
+    return {
+      ...data,
+      responseMessage: 'Updated medical package successfully.',
+    };
   }
 
   async remove(id: number) {
@@ -73,6 +99,10 @@ export class PackageService {
       throw new NotFoundException();
     }
 
-    return await this.packageRepository.remove(pkg);
+    const data = await this.packageRepository.remove(pkg);
+    return {
+      ...data,
+      responseMessage: 'Deleted medical package successfully.',
+    };
   }
 }

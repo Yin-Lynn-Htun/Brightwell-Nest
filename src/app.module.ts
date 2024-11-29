@@ -29,7 +29,6 @@ import { RoomModule } from './room/room.module';
 import { InpatientModule } from './inpatient/inpatient.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { InpatientChargeModule } from './inpatient-charge/inpatient-charge.module';
-import { DepositModule } from './deposit/deposit.module';
 import { SlotModule } from './slot/slot.module';
 import { MedicalHistoryModule } from './medical-history/medical-history.module';
 import { ReportsModule } from './reports/reports.module';
@@ -82,7 +81,6 @@ import { SeedService } from './seeders/seed.service';
     InpatientModule,
     TransactionModule,
     InpatientChargeModule,
-    DepositModule,
     SlotModule,
     MedicalHistoryModule,
     ReportsModule,

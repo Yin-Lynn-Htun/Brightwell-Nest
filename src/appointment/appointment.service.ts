@@ -190,7 +190,7 @@ export class AppointmentService {
     description,
   }: CreateServiceAppointmentDto & {
     patientId: number;
-  }): Promise<Appointment> {
+  }): Promise<Appointment & { responseMessage: string }> {
     // Check if the slot already exists
     let slot = await this.slotRepository.findOne({
       where: {
@@ -228,6 +228,9 @@ export class AppointmentService {
     appointment.description = description ?? '';
     await this.appointmentRepository.save(appointment);
 
-    return appointment;
+    return {
+      ...appointment,
+      responseMessage: 'Created appointment successfully.',
+    };
   }
 }

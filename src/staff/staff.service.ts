@@ -18,7 +18,6 @@ export class StaffService {
   async create(createStaffDto: CreateStaffDto) {
     const user = await this.userRespository.create({
       ...createStaffDto,
-      role: Role.Staff,
     });
 
     const staff = this.staffRespository.create({
@@ -26,7 +25,8 @@ export class StaffService {
       ...createStaffDto,
     });
 
-    return await this.staffRespository.save(staff);
+    const data = await this.staffRespository.save(staff);
+    return { ...data, responseMessage: 'Staff created successfully!' };
   }
 
   async findAll() {
@@ -75,7 +75,12 @@ export class StaffService {
   }
 
   async update(id: number, updateStaffDto: UpdateStaffDto) {
-    const staff = await this.findOne(id);
+    const staff = await this.staffRespository.findOne({
+      where: {
+        staffId: id,
+      },
+      relations: ['user'],
+    });
 
     if (!staff) {
       throw new NotFoundException();
@@ -83,6 +88,7 @@ export class StaffService {
 
     Object.assign(staff, updateStaffDto);
 
+    await this.userRespository.update(staff.user.userId, updateStaffDto);
     return await this.staffRespository.save(staff);
   }
 
@@ -93,6 +99,8 @@ export class StaffService {
       throw new NotFoundException();
     }
 
-    return await this.staffRespository.remove(staff);
+    await this.staffRespository.remove(staff);
+    const data = await this.userRespository.remove(staff.userId);
+    return { ...data, responseMessage: 'Delete staff successfully!' };
   }
 }

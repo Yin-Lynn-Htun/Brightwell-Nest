@@ -21,7 +21,7 @@ export class ClientAuthService {
   async login({
     email,
     password,
-  }: LoginPayload): Promise<{ accessToken: string }> {
+  }: LoginPayload): Promise<{ accessToken: string; responseMessage: string }> {
     const patient = await this.patientsService.findByEmail(email);
 
     if (!patient) throw new NotFoundException();
@@ -36,7 +36,7 @@ export class ClientAuthService {
       };
 
       const accessToken = this.jwtService.sign(payload);
-      return { accessToken };
+      return { accessToken, responseMessage: 'Login successfully!' };
     } else {
       throw new HttpException('Invalid credential', HttpStatus.BAD_REQUEST);
     }

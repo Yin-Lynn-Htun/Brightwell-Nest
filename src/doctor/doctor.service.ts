@@ -46,7 +46,8 @@ export class DoctorService {
       educations: eduList,
     });
 
-    return await this.doctorRespository.save(doc);
+    const data = await this.doctorRespository.save(doc);
+    return { ...data, responseMessage: 'Doctor is created successfully!' };
   }
 
   async findAll() {
@@ -101,11 +102,60 @@ export class DoctorService {
     return doctor;
   }
 
-  update(id: number, updateDoctorDto: UpdateDoctorDto) {
-    return `This action updates a #${id} doctor`;
+  async update(doctorId: number, updateDoctorDto: UpdateDoctorDto) {
+    // Fetch the doctor with the associated user
+    const doctor = await this.doctorRespository.findOne({
+      where: { doctorId },
+      relations: ['user'],
+    });
+
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+
+    const items = updateDoctorDto.specialties ?? [];
+
+    const eduList: any = [];
+    const educations = updateDoctorDto.educations ?? [];
+
+    // Fetch the specialties based on the IDs provided
+    const specialties = await this.specialityRepository.findByIds(
+      items.map((s) => +s),
+    );
+
+    for (const item of educations) {
+      const edu = await this.docEduRespository.create(item);
+      eduList.push(edu);
+    }
+
+    // Update the Doctor entity fields
+    Object.assign(doctor, {
+      ...updateDoctorDto,
+      specialties,
+      educations: eduList,
+    }); // Save the updated Doctor entity
+    await this.doctorRespository.save(doctor);
+
+    await this.userRespository.update(doctor.user.userId, updateDoctorDto);
+    return { doctor, responseMessage: 'Doctor is updated successfully!' };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} doctor`;
+  async remove(id: number) {
+    const doctor = await this.findOne(id);
+
+    if (!doctor) {
+      throw new NotFoundException();
+    }
+
+    const deletedDoctor = await this.doctorRespository.remove(doctor);
+
+    if (doctor?.user?.userId) {
+      this.userRespository.remove(doctor?.user.userId);
+    }
+
+    return {
+      ...deletedDoctor,
+      responseMessage: 'Deleted doctor successfully.',
+    };
   }
 }

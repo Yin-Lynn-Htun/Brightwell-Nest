@@ -9,7 +9,7 @@ export class InpatientCharge {
   @Column('decimal')
   amount: number;
 
-  @ManyToOne(() => Inpatient, (inpatient) => inpatient.deposits)
+  @ManyToOne(() => Inpatient, (inpatient) => inpatient.charges)
   inpatient: Inpatient;
 
   @Column('text', {

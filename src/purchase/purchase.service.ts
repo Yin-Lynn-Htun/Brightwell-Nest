@@ -50,7 +50,9 @@ export class PurchaseService {
       }
     }
 
-    return purchasePackages;
+    const data = purchasePackages;
+
+    return { ...data, reponseMessage: 'Purchased packages successfully.' };
   }
 
   findAll() {

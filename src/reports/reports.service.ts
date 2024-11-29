@@ -101,6 +101,7 @@ export class ReportsService {
       where: { createdAt: Between(lastStartDate, lastEndDate) },
     });
 
+    console.log(currentRevenue, lastRevenue, 'here');
     // Calculate Percentages
     const revenueChange = this.calculatePercentageChange(
       currentRevenue?.total,
@@ -154,8 +155,8 @@ export class ReportsService {
         start: currentMonthStart,
         end: currentEndDate,
       })
-      .andWhere('transaction.type = :type', {
-        type: TransactionType.APPOINTMENT,
+      .andWhere('transaction.type IN (:...types)', {
+        types: [TransactionType.APPOINTMENT, TransactionType.FOLLOW_UP_CHARGES],
       }) // Appointment transactions
       .andWhere('transaction.status = :status', {
         status: TransactionStatus.SUCCESS,
@@ -181,6 +182,29 @@ export class ReportsService {
       .orderBy('DATE(transaction.createdAt)', 'ASC')
       .getRawMany();
 
+    // Get appointment transactions
+    const inpatients = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .select('DATE(transaction.createdAt) as date')
+      .addSelect('SUM(transaction.amount) as amount')
+      .where('transaction.createdAt BETWEEN :start AND :end', {
+        start: currentMonthStart,
+        end: currentEndDate,
+      })
+      .andWhere('transaction.type IN (:...types)', {
+        types: [
+          TransactionType.INPATIENT,
+          TransactionType.DEPOSIT,
+          TransactionType.ROOM_DEPOSIT,
+        ],
+      }) // Appointment transactions
+      .andWhere('transaction.status = :status', {
+        status: TransactionStatus.SUCCESS,
+      })
+      .groupBy('DATE(transaction.createdAt)')
+      .orderBy('DATE(transaction.createdAt)', 'ASC')
+      .getRawMany();
+
     // Create a map of appointment transactions
     const appointmentMap = appointments.reduce((acc, record) => {
       acc[moment(record.date).format('YYYY-MM-DD')] = Number(record.amount);
@@ -189,6 +213,11 @@ export class ReportsService {
 
     // Create a map of package transactions
     const packageMap = packages.reduce((acc, record) => {
+      acc[moment(record.date).format('YYYY-MM-DD')] = Number(record.amount);
+      return acc;
+    }, {});
+
+    const inpatientMap = inpatients.reduce((acc, record) => {
       acc[moment(record.date).format('YYYY-MM-DD')] = Number(record.amount);
       return acc;
     }, {});
@@ -207,7 +236,10 @@ export class ReportsService {
       date: moment(date).format('DD/MM/YYYY'),
       appointmentAmount: appointmentMap[date] || 0,
       packageAmount: packageMap[date] || 0,
+      inpatientAmount: inpatientMap[date] || 0,
     }));
+
+    console.log({ formattedResult });
 
     return formattedResult;
   }
@@ -318,7 +350,6 @@ export class ReportsService {
   }
 
   async getPackagePurchaseCount(start: string, end: string) {
-    console.log('here');
     const query = this.purchaseRepository
       .createQueryBuilder('purchase')
       .select('package.name', 'packageName')

@@ -15,9 +15,14 @@ export class RoomService {
   ) {}
 
   async create(createRoomDto: CreateRoomDto) {
-    const roomType = await this.roomTypeRespository.findOne(
-      createRoomDto.roomType,
-    );
+    let roomType = null;
+    if (createRoomDto.roomType === 0) {
+      roomType = await this.roomTypeRespository.findByName(
+        'Doctor consulation room',
+      );
+    } else {
+      roomType = await this.roomTypeRespository.findOne(createRoomDto.roomType);
+    }
 
     if (!roomType) {
       throw new NotFoundException();
@@ -29,7 +34,8 @@ export class RoomService {
       floorLevel: createRoomDto.floorLevel,
     });
 
-    return await this.roomRespository.save(room);
+    const data = await this.roomRespository.save(room);
+    return { ...data, responseMessage: 'Created room successfully.' };
   }
 
   async findAll(roomType?: string, status?: string): Promise<Room[]> {
@@ -73,7 +79,8 @@ export class RoomService {
 
     Object.assign(room, updateRoomDto);
 
-    return await this.roomRespository.save(room);
+    const data = await this.roomRespository.save(room);
+    return { ...data, responseMessage: 'Updated room successfully.' };
   }
 
   async remove(id: number) {
@@ -85,7 +92,8 @@ export class RoomService {
       throw new NotFoundException();
     }
 
-    return this.roomRespository.delete(room);
+    const data = await this.roomRespository.remove(room);
+    return { ...data, responseMessage: 'Deleted room successfully.' };
   }
 
   async getAvailableRoom() {

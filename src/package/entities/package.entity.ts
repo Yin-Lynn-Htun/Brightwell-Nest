@@ -33,7 +33,9 @@ export class Package {
   @Column('decimal')
   normalPrice: number;
 
-  @ManyToOne(() => Purchase)
+  @ManyToOne(() => Purchase, {
+    onDelete: 'CASCADE',
+  })
   purchases: Purchase[];
 
   @ManyToMany(() => Tag)

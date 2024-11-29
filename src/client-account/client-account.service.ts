@@ -46,6 +46,8 @@ export class ClientAccountService {
 
           let scheduleDate: any;
 
+          if (!appointment.slot) return acc;
+
           if (isDoctorAppointment) {
             const date = appointment.slot?.date
               ? appointment.slot?.date

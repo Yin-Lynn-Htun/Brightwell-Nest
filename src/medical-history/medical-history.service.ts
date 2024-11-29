@@ -19,13 +19,17 @@ export class MedicalHistoryService {
     createMedicalHistoryDto: CreateMedicalHistoryDto,
     patient: Patient,
     user: User,
-  ): Promise<MedicalHistory> {
+  ): Promise<MedicalHistory & { responseMessage: string }> {
     const medicalHistory = this.medicalHistoryRepository.create({
       ...createMedicalHistoryDto,
       patient,
       createdBy: user,
     });
-    return await this.medicalHistoryRepository.save(medicalHistory);
+    const data = await this.medicalHistoryRepository.save(medicalHistory);
+    return {
+      ...data,
+      responseMessage: 'Medical history added successfully.',
+    };
   }
 
   async findAll(): Promise<MedicalHistory[]> {
@@ -48,7 +52,7 @@ export class MedicalHistoryService {
   async findOne(id: number): Promise<MedicalHistory> {
     const medicalHistory = await this.medicalHistoryRepository.findOne({
       where: { id },
-      relations: ['patient', 'createdBy', 'files'],
+      relations: ['patient', 'createdBy'],
     });
     if (!medicalHistory) {
       throw new NotFoundException(`Medical history with ID ${id} not found`);

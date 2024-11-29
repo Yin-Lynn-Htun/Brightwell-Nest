@@ -73,15 +73,13 @@ export class SlotService {
         const slotEndTime = slotTime.clone().add(slotDuration, 'minutes');
 
         // Check if the slot is already booked
-        // const existingSlot = await this.slotRepository.findOne({
-        //   where: {
-        //     appointmentType: appointmentType,
-        //     date: slotTime.toDate(), // Date without time
-        //     timeSlot: slotTime.format('HH:mm:ss'), // Time of the slot
-        //   },
-        // });
-
-        const existingSlot = undefined;
+        const existingSlot = await this.slotRepository.findOne({
+          where: {
+            date: slotTime.toDate().toDateString(), // Date without time
+            startTime: slotTime.format('HH:mm:ss'),
+            endTime: slotEndTime.format('HH:mm:ss'),
+          },
+        });
 
         const slot = {
           id: idx,

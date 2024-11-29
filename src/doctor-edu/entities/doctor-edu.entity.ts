@@ -30,6 +30,8 @@ export class DoctorEdu {
   @Column({ type: 'date' })
   endDate: string;
 
-  @ManyToOne(() => Doctor, (doctor) => doctor.educations)
+  @ManyToOne(() => Doctor, (doctor) => doctor.educations, {
+    onDelete: 'CASCADE',
+  })
   doctors: Doctor;
 }

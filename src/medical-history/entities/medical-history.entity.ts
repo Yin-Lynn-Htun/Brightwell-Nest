@@ -31,11 +31,6 @@ export class MedicalHistory {
   @Column({ type: 'text' })
   description: string;
 
-  // @OneToMany(() => MedicalHistoryFile, (file) => file.medicalHistory, {
-  //   cascade: true,
-  // })
-  // files: MedicalHistoryFile[];
-
   @ManyToOne(() => Patient, (patient) => patient.medicalHistories)
   patient: Patient;
 

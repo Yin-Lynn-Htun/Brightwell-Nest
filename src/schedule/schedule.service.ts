@@ -96,7 +96,7 @@ export class ScheduleService {
         );
         if (!roomAvailable) {
           throw new BadRequestException(
-            `Room ${shift.roomId} is already occupied during ${shift.startTime} - ${shift.endTime} on ${shift.dayOfWeek} (${date})`,
+            `Room ${shift.name} is already occupied during ${shift.startTime} - ${shift.endTime} on ${shift.dayOfWeek} (${date})`,
           );
         }
       }
@@ -152,7 +152,7 @@ export class ScheduleService {
       }
     }
 
-    return schedules;
+    return { ...schedules, responseMessage: 'Created schedule successfully.' };
   }
 
   // Utility function to generate 10-minute slots for each shift

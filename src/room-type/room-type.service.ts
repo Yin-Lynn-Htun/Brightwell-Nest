@@ -78,10 +78,18 @@ export class RoomTypeService {
     });
   }
 
+  async findByName(name: string) {
+    return await this.roomTypeRespository.findOne({
+      where: {
+        name: name,
+      },
+    });
+  }
+
   async update(id: number, updateRoomTypeDto: UpdateRoomTypeDto) {
     const roomType = await this.roomTypeRespository.findOne({
       where: {
-        id,
+        id: +id,
       },
     });
 
@@ -148,7 +156,7 @@ export class RoomTypeService {
         const c = await this.roomChargeRespository.create(charge);
         updatedCharges.push(c);
       } else {
-        const foundCharge = await this.roomChargeRespository.findOne(id);
+        const foundCharge = await this.roomChargeRespository.findOne(charge.id);
 
         if (!foundCharge) {
           throw new NotFoundException();
@@ -171,6 +179,11 @@ export class RoomTypeService {
     }
     roomType.charges = updatedCharges;
     // charges end
+
+    // images
+    if (updateRoomTypeDto?.images && updateRoomTypeDto?.images?.length > 0) {
+      roomType.images = updateRoomTypeDto.images;
+    }
 
     this.roomTypeRespository.save(roomType);
   }

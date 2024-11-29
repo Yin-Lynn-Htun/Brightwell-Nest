@@ -104,7 +104,9 @@ export class Patient {
   @CreateDateColumn()
   created_at: Date;
 
-  @OneToMany(() => Appointment, (appointment) => appointment.patient)
+  @OneToMany(() => Appointment, (appointment) => appointment.patient, {
+    onDelete: 'SET NULL',
+  })
   appointments: Appointment[];
 
   @OneToMany(() => Purchase, (purchase) => purchase.patient)
@@ -113,7 +115,9 @@ export class Patient {
   @OneToMany(() => Inpatient, (inpatient) => inpatient.patient)
   inpatients: Inpatient[];
 
-  @OneToMany(() => Transaction, (transaction) => transaction.patient)
+  @OneToMany(() => Transaction, (transaction) => transaction.patient, {
+    onDelete: 'SET NULL',
+  })
   transactions: Transaction[];
 
   @OneToMany(() => MedicalHistory, (medicalHistory) => medicalHistory.patient)

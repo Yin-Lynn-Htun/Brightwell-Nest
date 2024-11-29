@@ -1,14 +1,19 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UserService } from '../user/user.service'; // Adjust the path as needed
-import * as bcrypt from 'bcrypt';
+
 import { Gender, Relationship, Role } from 'src/user/entities/user.entity';
+import { RoomTypeService } from 'src/room-type/room-type.service';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private RoomTypeService: RoomTypeService,
+  ) {}
 
   async onModuleInit() {
     await this.seedAdminUser();
+    await this.seedDoctorRoomType();
   }
 
   private async seedAdminUser() {
@@ -41,6 +46,22 @@ export class SeedService implements OnModuleInit {
       console.log('Admin user created successfully.');
     } else {
       console.log('Admin user already exists.');
+    }
+  }
+
+  private async seedDoctorRoomType() {
+    const name = 'Doctor consulation room';
+    const roomExists = await this.RoomTypeService.findByName(name);
+    if (!roomExists) {
+      await this.RoomTypeService.create({
+        name: name,
+        description: '',
+        images: [],
+        charges: [],
+        amenities: [],
+      });
+    } else {
+      console.log('room already exists.');
     }
   }
 }

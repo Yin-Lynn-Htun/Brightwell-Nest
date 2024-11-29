@@ -40,9 +40,13 @@ export class Room {
   @CreateDateColumn()
   created_at: Date;
 
-  @ManyToOne(() => Schedule)
+  @ManyToOne(() => Schedule, (schedule) => schedule.room, {
+    onDelete: 'SET NULL',
+  })
   schedules: Schedule[];
 
-  @ManyToOne(() => Inpatient)
+  @ManyToOne(() => Inpatient, (inpatient) => inpatient.room, {
+    onDelete: 'SET NULL',
+  })
   inpatients: Inpatient[];
 }

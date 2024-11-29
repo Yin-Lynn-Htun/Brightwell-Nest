@@ -32,11 +32,15 @@ export class Doctor {
   languages: string[];
 
   // education
-  @OneToMany(() => DoctorEdu, (education) => education.doctors)
+  @OneToMany(() => DoctorEdu, (education) => education.doctors, {
+    onDelete: 'CASCADE',
+  })
   educations: DoctorEdu[];
 
   // schedules
-  @OneToMany(() => Schedule, (schedule) => schedule.doctor)
+  @OneToMany(() => Schedule, (schedule) => schedule.doctor, {
+    onDelete: 'SET NULL',
+  })
   schedules: Schedule[];
 
   // TODO: Work exp
@@ -47,6 +51,12 @@ export class Doctor {
   @Column({ type: 'varchar', length: 50 })
   idNumber: string;
 
-  @OneToMany(() => MedicalHistory, (medicalHistory) => medicalHistory.createdBy)
+  @OneToMany(
+    () => MedicalHistory,
+    (medicalHistory) => medicalHistory.createdBy,
+    {
+      onDelete: 'SET NULL',
+    },
+  )
   medicalHistories: MedicalHistory[];
 }

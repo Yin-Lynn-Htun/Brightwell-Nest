@@ -22,7 +22,7 @@ export class AuthService {
 
   async signIn(
     authcredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; responseMessage: string }> {
     const { email, password } = authcredentialsDto;
     const user = await this.userRepository.findOne({
       where: { email },
@@ -50,7 +50,7 @@ export class AuthService {
       };
       console.log(payload, 'here payload');
       const accessToken = this.jwtService.sign(payload);
-      return { accessToken };
+      return { accessToken, responseMessage: 'Login successfully!' };
     } else {
       throw new UnauthorizedException('Please check your login credentials.');
     }
